@@ -1,0 +1,598 @@
+@@ -0,0 +1,177 @@
+// This file is public domain
+// SHA routines extracted as a standalone file from:
+// Crypto++: a C++ Class Library of Cryptographic Schemes
+// Version 5.5.2 (9/24/2007)
+// http://www.cryptopp.com
+#ifndef CRYPTOPP_SHA_H
+#define CRYPTOPP_SHA_H
+#include <stdlib.h>
+
+namespace CryptoPP
+{
+
+//
+// Dependencies
+//
+
+typedef unsigned char byte;
+typedef unsigned short word16;
+typedef unsigned int word32;
+#if defined(_MSC_VER) || defined(__BORLANDC__)
+typedef unsigned __int64 word64;
+#else
+typedef unsigned long long word64;
+#endif
+
+template <class T> inline T rotlFixed(T x, unsigned int y)
+{
+    assert(y < sizeof(T)*8);
+    return T((x<<y) | (x>>(sizeof(T)*8-y)));
+}
+
+template <class T> inline T rotrFixed(T x, unsigned int y)
+{
+    assert(y < sizeof(T)*8);
+    return T((x>>y) | (x<<(sizeof(T)*8-y)));
+}
+
+// ************** endian reversal ***************
+
+#ifdef _MSC_VER
+    #if _MSC_VER >= 1400
+        #define CRYPTOPP_FAST_ROTATE(x) 1
+    #elif _MSC_VER >= 1300
+        #define CRYPTOPP_FAST_ROTATE(x) ((x) == 32 | (x) == 64)
+    #else
+        #define CRYPTOPP_FAST_ROTATE(x) ((x) == 32)
+    #endif
+#elif (defined(__MWERKS__) && TARGET_CPU_PPC) || \
+    (defined(__GNUC__) && (defined(_ARCH_PWR2) || defined(_ARCH_PWR) || defined(_ARCH_PPC) || defined(_ARCH_PPC64) || defined(_ARCH_COM)))
+    #define CRYPTOPP_FAST_ROTATE(x) ((x) == 32)
+#elif defined(__GNUC__) && (CRYPTOPP_BOOL_X64 || CRYPTOPP_BOOL_X86) // depend on GCC's peephole optimization to generate rotate instructions
+    #define CRYPTOPP_FAST_ROTATE(x) 1
+#else
+    #define CRYPTOPP_FAST_ROTATE(x) 0
+#endif
+
+inline byte ByteReverse(byte value)
+{
+    return value;
+}
+
+inline word16 ByteReverse(word16 value)
+{
+#ifdef CRYPTOPP_BYTESWAP_AVAILABLE
+    return bswap_16(value);
+#elif defined(_MSC_VER) && _MSC_VER >= 1300
+    return _byteswap_ushort(value);
+#else
+    return rotlFixed(value, 8U);
+#endif
+}
+
+inline word32 ByteReverse(word32 value)
+{
+#if defined(__GNUC__)
+    __asm__ ("bswap %0" : "=r" (value) : "0" (value));
+    return value;
+#elif defined(CRYPTOPP_BYTESWAP_AVAILABLE)
+    return bswap_32(value);
+#elif defined(__MWERKS__) && TARGET_CPU_PPC
+    return (word32)__lwbrx(&value,0);
+#elif _MSC_VER >= 1400 || (_MSC_VER >= 1300 && !defined(_DLL))
+    return _byteswap_ulong(value);
+#elif CRYPTOPP_FAST_ROTATE(32)
+    // 5 instructions with rotate instruction, 9 without
+    return (rotrFixed(value, 8U) & 0xff00ff00) | (rotlFixed(value, 8U) & 0x00ff00ff);
+#else
+    // 6 instructions with rotate instruction, 8 without
+    value = ((value & 0xFF00FF00) >> 8) | ((value & 0x00FF00FF) << 8);
+    return rotlFixed(value, 16U);
+#endif
+}
+
+#ifdef WORD64_AVAILABLE
+inline word64 ByteReverse(word64 value)
+{
+#if defined(__GNUC__) && defined(__x86_64__)
+    __asm__ ("bswap %0" : "=r" (value) : "0" (value));
+    return value;
+#elif defined(CRYPTOPP_BYTESWAP_AVAILABLE)
+    return bswap_64(value);
+#elif defined(_MSC_VER) && _MSC_VER >= 1300
+    return _byteswap_uint64(value);
+#elif defined(CRYPTOPP_SLOW_WORD64)
+    return (word64(ByteReverse(word32(value))) << 32) | ByteReverse(word32(value>>32));
+#else
+    value = ((value & W64LIT(0xFF00FF00FF00FF00)) >> 8) | ((value & W64LIT(0x00FF00FF00FF00FF)) << 8);
+    value = ((value & W64LIT(0xFFFF0000FFFF0000)) >> 16) | ((value & W64LIT(0x0000FFFF0000FFFF)) << 16);
+    return rotlFixed(value, 32U);
+#endif
+}
+#endif
+
+
+//
+// SHA
+//
+
+// http://www.weidai.com/scan-mirror/md.html#SHA-1
+class SHA1
+{
+public:
+    typedef word32 HashWordType;
+    static void InitState(word32 *state);
+    static void Transform(word32 *digest, const word32 *data);
+    static const char * StaticAlgorithmName() {return "SHA-1";}
+};
+
+typedef SHA1 SHA;   // for backwards compatibility
+
+// implements the SHA-256 standard
+class SHA256
+{
+public:
+    typedef word32 HashWordType;
+    static void InitState(word32 *state);
+    static void Transform(word32 *digest, const word32 *data);
+    static const char * StaticAlgorithmName() {return "SHA-256";}
+};
+
+// implements the SHA-224 standard
+class SHA224
+{
+public:
+    typedef word32 HashWordType;
+    static void InitState(word32 *state);
+    static void Transform(word32 *digest, const word32 *data) {SHA256::Transform(digest, data);}
+    static const char * StaticAlgorithmName() {return "SHA-224";}
+};
+
+#ifdef WORD64_AVAILABLE
+
+// implements the SHA-512 standard
+class SHA512
+{
+public:
+    typedef word64 HashWordType;
+    static void InitState(word64 *state);
+    static void Transform(word64 *digest, const word64 *data);
+    static const char * StaticAlgorithmName() {return "SHA-512";}
+};
+
+// implements the SHA-384 standard
+class SHA384
+{
+public:
+    typedef word64 HashWordType;
+    static void InitState(word64 *state);
+    static void Transform(word64 *digest, const word64 *data) {SHA512::Transform(digest, data);}
+    static const char * StaticAlgorithmName() {return "SHA-384";}
+};
+
+#endif
+
+}
+
+#endif
+@@ -0,0 +1,420 @@
+// Copyright (c) 2009 Satoshi Nakamoto
+// Distributed under the MIT/X11 software license, see the accompanying
+// file license.txt or http://www.opensource.org/licenses/mit-license.php.
+
+
+
+
+DECLARE_EVENT_TYPE(wxEVT_CROSSTHREADCALL, -1)
+DECLARE_EVENT_TYPE(wxEVT_REPLY1, -1)
+DECLARE_EVENT_TYPE(wxEVT_REPLY2, -1)
+DECLARE_EVENT_TYPE(wxEVT_REPLY3, -1)
+DECLARE_EVENT_TYPE(wxEVT_TABLEADDED, -1)
+DECLARE_EVENT_TYPE(wxEVT_TABLEUPDATED, -1)
+DECLARE_EVENT_TYPE(wxEVT_TABLEDELETED, -1)
+
+enum
+{
+    UICALL_ADDORDER = 1,
+    UICALL_UPDATEORDER,
+};
+
+
+
+extern void HandleCtrlA(wxKeyEvent& event);
+extern string DateTimeStr(int64 nTime);
+extern string FormatTxStatus(const CWalletTx& wtx);
+extern void CrossThreadCall(int nID, void* pdata);
+extern void MainFrameRepaint();
+extern void Shutdown(void* parg);
+
+
+
+
+
+
+class CMainFrame : public CMainFrameBase
+{
+protected:
+    // Event handlers
+    void OnClose(wxCloseEvent& event);
+    void OnMouseEvents(wxMouseEvent& event);
+    void OnKeyDown(wxKeyEvent& event) { HandleCtrlA(event); }
+    void OnIdle(wxIdleEvent& event);
+    void OnPaint(wxPaintEvent& event);
+    void OnPaintListCtrl(wxPaintEvent& event);
+    void OnMenuFileExit(wxCommandEvent& event);
+    void OnMenuOptionsGenerate(wxCommandEvent& event);
+    void OnMenuOptionsChangeYourAddress(wxCommandEvent& event);
+    void OnMenuOptionsOptions(wxCommandEvent& event);
+    void OnMenuHelpAbout(wxCommandEvent& event);
+    void OnButtonSend(wxCommandEvent& event);
+    void OnButtonAddressBook(wxCommandEvent& event);
+    void OnSetFocusAddress(wxFocusEvent& event);
+    void OnMouseEventsAddress(wxMouseEvent& event);
+    void OnButtonCopy(wxCommandEvent& event);
+    void OnButtonChange(wxCommandEvent& event);
+    void OnListColBeginDrag(wxListEvent& event);
+    void OnListItemActivatedAllTransactions(wxListEvent& event);
+    void OnListItemActivatedProductsSent(wxListEvent& event);
+    void OnListItemActivatedOrdersSent(wxListEvent& event);
+    void OnListItemActivatedOrdersReceived(wxListEvent& event);
+	
+public:
+    /** Constructor */
+    CMainFrame(wxWindow* parent);
+    ~CMainFrame();
+
+    // Custom
+    bool fRefreshListCtrl;
+    bool fRefreshListCtrlRunning;
+    bool fOnSetFocusAddress;
+    CBlockIndex* pindexBestLast;
+    set<uint256> setUnmaturedDisplayed;
+
+    void OnCrossThreadCall(wxCommandEvent& event);
+    void InsertLine(bool fNew, int nIndex, uint256 hashKey, string strSort, const wxString& str1, const wxString& str2, const wxString& str3, const wxString& str4, const wxString& str5);
+    void InsertTransaction(const CWalletTx& wtx, bool fNew, int nIndex=-1);
+    void RefreshListCtrl();
+    void RefreshStatus();
+};
+
+
+
+
+class CTxDetailsDialog : public CTxDetailsDialogBase
+{
+protected:
+    // Event handlers
+    void OnButtonOK(wxCommandEvent& event);
+
+public:
+    /** Constructor */
+    CTxDetailsDialog(wxWindow* parent, CWalletTx wtx);
+
+    // State
+    CWalletTx wtx;
+};
+
+
+
+class COptionsDialog : public COptionsDialogBase
+{
+protected:
+    // Event handlers
+    void OnKillFocusTransactionFee(wxFocusEvent& event);
+    void OnButtonOK(wxCommandEvent& event);
+    void OnButtonCancel(wxCommandEvent& event);
+
+public:
+    /** Constructor */
+    COptionsDialog(wxWindow* parent);
+};
+
+
+
+class CAboutDialog : public CAboutDialogBase
+{
+protected:
+    // Event handlers
+    void OnButtonOK(wxCommandEvent& event);
+
+public:
+    /** Constructor */
+    CAboutDialog(wxWindow* parent);
+};
+
+
+
+class CSendDialog : public CSendDialogBase
+{
+protected:
+    // Event handlers
+    void OnKeyDown(wxKeyEvent& event) { HandleCtrlA(event); }
+    void OnTextAddress(wxCommandEvent& event);
+    void OnKillFocusAmount(wxFocusEvent& event);
+    void OnButtonAddressBook(wxCommandEvent& event);
+    void OnButtonPaste(wxCommandEvent& event);
+    void OnButtonSend(wxCommandEvent& event);
+    void OnButtonCancel(wxCommandEvent& event);
+	
+public:
+    /** Constructor */
+    CSendDialog(wxWindow* parent, const wxString& strAddress="");
+};
+
+
+
+class CSendingDialog : public CSendingDialogBase
+{
+public:
+    // Event handlers
+    void OnClose(wxCloseEvent& event);
+    void OnButtonOK(wxCommandEvent& event);
+    void OnButtonCancel(wxCommandEvent& event);
+    void OnPaint(wxPaintEvent& event);
+	
+public:
+    /** Constructor */
+    CSendingDialog(wxWindow* parent, const CAddress& addrIn, int64 nPriceIn, const CWalletTx& wtxIn);
+    ~CSendingDialog();
+
+    // State
+    CAddress addr;
+    int64 nPrice;
+    CWalletTx wtx;
+    wxDateTime start;
+    string strStatus;
+    bool fCanCancel;
+    bool fAbort;
+    bool fSuccess;
+    bool fUIDone;
+    bool fWorkDone;
+
+    void Close();
+    void Repaint();
+    bool Status();
+    bool Status(const string& str);
+    bool Error(const string& str);
+    void StartTransfer();
+    void OnReply2(CDataStream& vRecv);
+    void OnReply3(CDataStream& vRecv);
+};
+
+void SendingDialogStartTransfer(void* parg);
+void SendingDialogOnReply2(void* parg, CDataStream& vRecv);
+void SendingDialogOnReply3(void* parg, CDataStream& vRecv);
+
+
+
+class CYourAddressDialog : public CYourAddressDialogBase
+{
+protected:
+    // Event handlers
+    void OnListEndLabelEdit(wxListEvent& event);
+    void OnListItemSelected(wxListEvent& event);
+    void OnListItemActivated(wxListEvent& event);
+    void OnButtonRename(wxCommandEvent& event);
+    void OnButtonNew(wxCommandEvent& event);
+    void OnButtonCopy(wxCommandEvent& event);
+    void OnButtonOK(wxCommandEvent& event);
+    void OnButtonCancel(wxCommandEvent& event);
+    void OnClose(wxCloseEvent& event);
+
+public:
+    /** Constructor */
+    CYourAddressDialog(wxWindow* parent);
+    CYourAddressDialog(wxWindow* parent, const string& strInitSelected);
+
+    // Custom
+    wxString GetAddress();
+};
+
+
+
+class CAddressBookDialog : public CAddressBookDialogBase
+{
+protected:
+    // Event handlers
+    void OnListEndLabelEdit(wxListEvent& event);
+    void OnListItemSelected(wxListEvent& event);
+    void OnListItemActivated(wxListEvent& event);
+    void OnButtonEdit(wxCommandEvent& event);
+    void OnButtonDelete(wxCommandEvent& event);
+    void OnButtonNew(wxCommandEvent& event);
+    void OnButtonCopy(wxCommandEvent& event);
+    void OnButtonOK(wxCommandEvent& event);
+    void OnButtonCancel(wxCommandEvent& event);
+    void OnClose(wxCloseEvent& event);
+
+public:
+    /** Constructor */
+    CAddressBookDialog(wxWindow* parent, const wxString& strInitSelected, bool fSendingIn);
+
+    // Custom
+    bool fSending;
+    wxString GetAddress();
+    bool CheckIfMine(const string& strAddress, const string& strTitle);
+};
+
+
+
+class CProductsDialog : public CProductsDialogBase
+{
+protected:
+    // Event handlers
+    void OnKeyDown(wxKeyEvent& event) { HandleCtrlA(event); }
+    void OnCombobox(wxCommandEvent& event);
+    void OnButtonSearch(wxCommandEvent& event);
+    void OnListItemActivated(wxListEvent& event);
+
+public:
+    /** Constructor */
+    CProductsDialog(wxWindow* parent);
+
+    // Custom
+    vector<CProduct> m_vProduct;
+};
+
+
+
+class CEditProductDialog : public CEditProductDialogBase
+{
+protected:
+    // Event handlers
+    void OnKeyDown(wxKeyEvent& event) { HandleCtrlA(event); }
+    void OnButtonDel0(wxCommandEvent& event);
+    void OnButtonDel1(wxCommandEvent& event);
+    void OnButtonDel2(wxCommandEvent& event);
+    void OnButtonDel3(wxCommandEvent& event);
+    void OnButtonDel4(wxCommandEvent& event);
+    void OnButtonDel5(wxCommandEvent& event);
+    void OnButtonDel6(wxCommandEvent& event);
+    void OnButtonDel7(wxCommandEvent& event);
+    void OnButtonDel8(wxCommandEvent& event);
+    void OnButtonDel9(wxCommandEvent& event);
+    void OnButtonDel10(wxCommandEvent& event);
+    void OnButtonDel11(wxCommandEvent& event);
+    void OnButtonDel12(wxCommandEvent& event);
+    void OnButtonDel13(wxCommandEvent& event);
+    void OnButtonDel14(wxCommandEvent& event);
+    void OnButtonDel15(wxCommandEvent& event);
+    void OnButtonDel16(wxCommandEvent& event);
+    void OnButtonDel17(wxCommandEvent& event);
+    void OnButtonDel18(wxCommandEvent& event);
+    void OnButtonDel19(wxCommandEvent& event);
+    void OnButtonAddField(wxCommandEvent& event);
+    void OnButtonSend(wxCommandEvent& event);
+    void OnButtonPreview(wxCommandEvent& event);
+    void OnButtonCancel(wxCommandEvent& event);
+
+public:
+    /** Constructor */
+    CEditProductDialog(wxWindow* parent);
+
+    // Custom
+    enum { FIELDS_MAX = 20 };
+    wxTextCtrl* m_textCtrlLabel[FIELDS_MAX];
+    wxTextCtrl* m_textCtrlField[FIELDS_MAX];
+    wxButton*   m_buttonDel[FIELDS_MAX];
+
+    void LayoutAll();
+    void ShowLine(int i, bool fShow=true);
+    void OnButtonDel(wxCommandEvent& event, int n);
+    void SetProduct(const CProduct& productIn);
+    void GetProduct(CProduct& product);
+
+};
+
+
+
+class CViewProductDialog : public CViewProductDialogBase
+{
+protected:
+    // Event handlers
+    void OnButtonSubmitForm(wxCommandEvent& event);
+    void OnButtonCancelForm(wxCommandEvent& event);
+    void OnButtonBack(wxCommandEvent& event);
+    void OnButtonNext(wxCommandEvent& event);
+    void OnButtonCancel(wxCommandEvent& event);
+
+public:
+    /** Constructor */
+    CViewProductDialog(wxWindow* parent, const CProduct& productIn);
+    ~CViewProductDialog();
+
+    // Custom
+    CProduct product;
+    enum { FIELDS_MAX = 20 };
+    wxStaticText* m_staticTextLabel[FIELDS_MAX];
+    wxTextCtrl*   m_textCtrlField[FIELDS_MAX];
+    wxChoice*     m_choiceField[FIELDS_MAX];
+
+    void GetOrder(CWalletTx& order);
+    void UpdateProductDisplay(bool fDetails);
+    void OnReply1(wxCommandEvent& event);
+};
+
+
+
+class CViewOrderDialog : public CViewOrderDialogBase
+{
+protected:
+    // Event handlers
+    void OnButtonOK(wxCommandEvent& event);
+
+public:
+    /** Constructor */
+    CViewOrderDialog(wxWindow* parent, CWalletTx order, bool fReceived);
+
+    // Custom
+    bool fReceived;
+};
+
+
+
+class CEditReviewDialog : public CEditReviewDialogBase
+{
+protected:
+    // Event handlers
+    void OnKeyDown(wxKeyEvent& event) { HandleCtrlA(event); }
+    void OnButtonSubmit(wxCommandEvent& event);
+    void OnButtonCancel(wxCommandEvent& event);
+
+public:
+    /** Constructor */
+    CEditReviewDialog(wxWindow* parent);
+
+    // Custom
+    void GetReview(CReview& review);
+};
+
+
+
+class CGetTextFromUserDialog : public CGetTextFromUserDialogBase
+{
+protected:
+    // Event handlers
+    void OnButtonOK(wxCommandEvent& event)     { EndModal(true); }
+    void OnButtonCancel(wxCommandEvent& event) { EndModal(false); }
+    void OnClose(wxCloseEvent& event)          { EndModal(false); }
+
+    void OnKeyDown(wxKeyEvent& event)
+    {
+        if (event.GetKeyCode() == '\r' || event.GetKeyCode() == WXK_NUMPAD_ENTER)
+            EndModal(true);
+        else
+            HandleCtrlA(event);
+    }
+
+public:
+    /** Constructor */
+    CGetTextFromUserDialog(wxWindow* parent,
+                           const string& strCaption,
+                           const string& strMessage1,
+                           const string& strValue1="",
+                           const string& strMessage2="",
+                           const string& strValue2="") : CGetTextFromUserDialogBase(parent, wxID_ANY, strCaption)
+    {
+        m_staticTextMessage1->SetLabel(strMessage1);
+        m_textCtrl1->SetValue(strValue1);
+        if (!strMessage2.empty())
+        {
+            m_staticTextMessage2->Show(true);
+            m_staticTextMessage2->SetLabel(strMessage2);
+            m_textCtrl2->Show(true);
+            m_textCtrl2->SetValue(strValue2);
+            SetSize(wxDefaultCoord, 180);
+        }
+    }
+
+    // Custom
+    string GetValue()  { return (string)m_textCtrl1->GetValue(); }
+    string GetValue1() { return (string)m_textCtrl1->GetValue(); }
+    string GetValue2() { return (string)m_textCtrl2->GetValue(); }
+};
+
+
+
+
