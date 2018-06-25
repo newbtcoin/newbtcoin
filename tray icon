@@ -1,0 +1,53 @@
+@@ -0,0 +1,4 @@
+Known bugs:
+- For some reason, CreateHardLink doesn't add a shortcut to the startup folder
+- When the program is minimized to tray, double clicking the icon only restores it to the task bar
+- Window flickers when blocks are added (problem with repainting?)
+\ No newline at end of file
+@@ -1,2 +1,6 @@
+Changes after 0.1.5:
+--------------------
++ Options dialog layout changed - added the UI options panel
++ Minimize to tray feature
++ Startup on system boot feature
++ Ask before closing
+\ No newline at end of file
+
+@@ -575,6 +575,11 @@ bool CWalletDB::LoadWallet(vector<unsigned char>& vchDefaultKeyRet)
+                if (strKey == "fGenerateBitcoins")  ssValue >> fGenerateBitcoins;
+                if (strKey == "nTransactionFee")    ssValue >> nTransactionFee;
+                if (strKey == "addrIncoming")       ssValue >> addrIncoming;
+                if (strKey == "minimizeToTray")       ssValue >> minimizeToTray;
+                if (strKey == "closeToTray")       ssValue >> closeToTray;
+                if (strKey == "startOnSysBoot")       ssValue >> startOnSysBoot;
+                if (strKey == "askBeforeClosing")       ssValue >> askBeforeClosing;
+                if (strKey == "alwaysShowTrayIcon")       ssValue >> alwaysShowTrayIcon;
+            }
+        }
+    }
+    @@ -10,11 +10,16 @@
+#ifdef _WIN32_WINNT
+#undef _WIN32_WINNT
+#endif
+#define _WIN32_WINNT 0x0400
+#define _WIN32_WINNT 0x0500
+#ifdef _WIN32_IE
+#undef _WIN32_IE
+#endif
+#define _WIN32_IE 0x0500
+#define WIN32_LEAN_AND_MEAN 1
+#include <wx/wx.h>
+#include <wx/clipbrd.h>
+#include <wx/snglinst.h>
+#include <wx/taskbar.h>
+#include <openssl/ecdsa.h>
+#include <openssl/evp.h>
+#include <openssl/rand.h>
+@@ -32,6 +37,7 @@
+#include <assert.h>
+#include <process.h>
+#include <malloc.h>
+#include <shlobj.h>
+#include <memory>
+#define BOUNDSCHECK 1
+#include <sstream>
