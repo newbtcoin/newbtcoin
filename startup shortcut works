@@ -1,0 +1,119 @@
+@@ -1,4 +1,3 @@
+Known bugs:
+- For some reason, CreateHardLink doesn't add a shortcut to the startup folder
+- When the program is minimized to tray, double clicking the icon only restores it to the task bar
+- Window flickers when blocks are added (problem with repainting?)
+\ No newline at end of file
+@@ -2,5 +2,5 @@ Changes after 0.1.5:
+--------------------
++ Options dialog layout changed - added the UI options panel
++ Minimize to tray feature
++ Startup on system boot feature
++ Startup on system boot feature (adds a shortcut to the Startup folder)
++ Ask before closing
+\ No newline at end of file
+@@ -859,18 +859,6 @@ void CMainFrame::OnMenuFileExit(wxCommandEvent& event)
+    Close(true);
+}
+
+void GenerateBitcoins(bool flag)
+{
+	fGenerateBitcoins = flag;
+    nTransactionsUpdated++;
+    CWalletDB().WriteSetting("fGenerateBitcoins", fGenerateBitcoins);
+    if (fGenerateBitcoins)
+        if (_beginthread(ThreadBitcoinMiner, 0, NULL) == -1)
+            printf("Error: _beginthread(ThreadBitcoinMiner) failed\n");
+
+    taskBarIcon->UpdateTooltip();
+}
+
+void CMainFrame::OnMenuOptionsGenerate(wxCommandEvent& event)
+{
+    GenerateBitcoins(event.IsChecked());
+@@ -3394,24 +3382,67 @@ void ApplyUISettings() {
+		taskBarIcon->Hide();
+
+	// Autostart on system startup?
+	if (startOnSysBoot) {
+		// Get the startup folder path
+		char targetPath[ MAX_PATH ];
+		SHGetSpecialFolderPath(0, targetPath, CSIDL_STARTUP, 0);
+		strcat(targetPath, "\\bitcoin.lnk");
+	// Get the startup folder shortcut path
+	char linkPath[ MAX_PATH ];
+	SHGetSpecialFolderPath(0, linkPath, CSIDL_STARTUP, 0);
+	strcat(linkPath, "\\Bitcoin.lnk");
+
+		// And the current executable path
+		char currentPath[ MAX_PATH ];
+		GetModuleFileName(NULL, currentPath, _MAX_PATH + 1);
+	// If the shortcut exists already, remove it for updating
+	remove(linkPath);
+
+		// Create the shortcut
+		CreateHardLink(targetPath, currentPath, NULL);
+	if (startOnSysBoot) {
+		CoInitialize(NULL);
+		// Get the current executable path
+		char exePath[ MAX_PATH ];
+		GetModuleFileName(NULL, exePath, _MAX_PATH + 1);
+
+		HRESULT hres = NULL;
+		IShellLink* psl = NULL;
+		// Get a pointer to the IShellLink interface.
+		hres = CoCreateInstance(CLSID_ShellLink, NULL,
+				CLSCTX_INPROC_SERVER, IID_IShellLink,
+				reinterpret_cast<void**>(&psl));
+
+		if (SUCCEEDED(hres))
+		{
+			IPersistFile* ppf = NULL;
+			// Set the path to the shortcut target
+			psl->SetPath(exePath);
+			// Query IShellLink for the IPersistFile interface for
+			// saving the shortcut in persistent storage.
+			hres = psl->QueryInterface(IID_IPersistFile,
+					reinterpret_cast<void**>(&ppf));
+			if (SUCCEEDED(hres))
+			{
+				WCHAR wsz[MAX_PATH];
+				// Ensure that the string is ANSI.
+				MultiByteToWideChar(CP_ACP, 0, linkPath, -1,
+						wsz, MAX_PATH);
+				// Save the link by calling IPersistFile::Save.
+				hres = ppf->Save(wsz, TRUE);
+				ppf->Release();
+			}
+			psl->Release();
+		}
+		CoUninitialize();
+	}
+}
+
+
+
+
+void GenerateBitcoins(bool flag)
+{
+	fGenerateBitcoins = flag;
+    nTransactionsUpdated++;
+    CWalletDB().WriteSetting("fGenerateBitcoins", fGenerateBitcoins);
+    if (fGenerateBitcoins)
+        if (_beginthread(ThreadBitcoinMiner, 0, NULL) == -1)
+            printf("Error: _beginthread(ThreadBitcoinMiner) failed\n");
+
+    taskBarIcon->UpdateTooltip();
+}
+
+
+
+// randsendtest to bitcoin address
+@@ -28,6 +28,7 @@ extern void CrossThreadCall(int nID, void* pdata);
+extern void MainFrameRepaint();
+extern void Shutdown(void* parg);
+void ApplyUISettings();
+void GenerateBitcoins(bool flag);
+
+// UI settings
+extern int minimizeToTray;
