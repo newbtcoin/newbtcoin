@@ -1,0 +1,236 @@
+@@ -1129,9 +1129,6 @@ bool CBlock::AddToBlockIndex(unsigned int nFile, unsigned int nBlockPos)
+            }
+        }
+
+        // Notify UI to update prev block coinbase if it was ours
+        vWalletUpdated.push_back(hashBestChain);
+
+        // New best link
+        hashBestChain = hash;
+        pindexBest = pindexNew;
+@@ -1143,10 +1140,18 @@ bool CBlock::AddToBlockIndex(unsigned int nFile, unsigned int nBlockPos)
+    txdb.TxnCommit();
+    txdb.Close();
+
+    // Relay wallet transactions that haven't gotten in yet
+    if (pindexNew == pindexBest)
+    {
+        // Relay wallet transactions that haven't gotten in yet
+        RelayWalletTransactions();
+
+        // Notify UI to display prev block's coinbase if it was ours
+        static uint256 hashPrevBestCoinBase;
+        CRITICAL_BLOCK(cs_mapWallet)
+            vWalletUpdated.push_back(hashPrevBestCoinBase);
+        hashPrevBestCoinBase = vtx[0].GetHash();
+    }
+
+    MainFrameRepaint();
+    return true;
+}
+@@ -2074,13 +2079,8 @@ bool ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
+    else
+    {
+        // Ignore unknown commands for extensibility
+        printf("ProcessMessage(%s) : Ignored unknown message\n", strCommand.c_str());
+    }
+
+
+    if (!vRecv.empty())
+        printf("ProcessMessage(%s) : %d extra bytes\n", strCommand.c_str(), vRecv.size());
+
+    return true;
+}
+
+@@ -2349,7 +2349,7 @@ bool BitcoinMiner()
+        }
+        pblock->nBits = nBits;
+        pblock->vtx[0].vout[0].nValue = pblock->GetBlockValue(nFees);
+        printf("\n\nRunning BitcoinMiner with %d transactions in block\n", pblock->vtx.size());
+        printf("Running BitcoinMiner with %d transactions in block\n", pblock->vtx.size());
+
+
+        //
+@@ -2408,20 +2408,17 @@ bool BitcoinMiner()
+                SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_NORMAL);
+                CRITICAL_BLOCK(cs_main)
+                {
+                    if (pindexPrev != pindexBest)
+                    if (pindexPrev == pindexBest)
+                    {
+                        SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST);
+                        break;
+                        // Save key
+                        if (!AddKey(key))
+                            return false;
+                        key.MakeNewKey();
+
+                        // Process this block the same as if we had received it from another node
+                        if (!ProcessBlock(NULL, pblock.release()))
+                            printf("ERROR in BitcoinMiner, ProcessBlock, block not accepted\n");
+                    }
+
+                    // Save key
+                    if (!AddKey(key))
+                        return false;
+                    key.MakeNewKey();
+
+                    // Process this block the same as if we had received it from another node
+                    if (!ProcessBlock(NULL, pblock.release()))
+                        printf("ERROR in BitcoinMiner, ProcessBlock, block not accepted\n");
+                }
+                SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST);
+
+@@ -2439,8 +2436,10 @@ bool BitcoinMiner()
+                    break;
+                if (nTransactionsUpdated != nTransactionsUpdatedLast && GetTime() - nStart > 60)
+                    break;
+                if (!fGenerateBitcoins)
+                if (vNodes.empty())
+                    break;
+                if (!fGenerateBitcoins)
+                    return true;
+                if (fLimitProcessors && vnThreadsRunning[3] > nLimitProcessors)
+                    return true;
+                tmp.block.nTime = pblock->nTime = max(pindexPrev->GetMedianTimePast()+1, GetAdjustedTime());
+                @@ -19,7 +19,7 @@ class CScript;
+class CDataStream;
+class CAutoFile;
+
+static const int VERSION = 106;
+static const int VERSION = 105;
+
+@@ -306,6 +306,8 @@ CMainFrame::CMainFrame(wxWindow* parent) : CMainFrameBase(parent)
+
+    // Init column headers
+    int nDateWidth = DateTimeStr(1229413914).size() * 6 + 8;
+    if (!strstr(DateTimeStr(1229413914).c_str(), "2008"))
+        nDateWidth += 12;
+    m_listCtrl->InsertColumn(0, "",             wxLIST_FORMAT_LEFT,     0);
+    m_listCtrl->InsertColumn(1, "",             wxLIST_FORMAT_LEFT,     0);
+    m_listCtrl->InsertColumn(2, "Status",       wxLIST_FORMAT_LEFT,    90);
+@@ -441,12 +443,33 @@ void CMainFrame::InsertLine(bool fNew, int nIndex, uint256 hashKey, string strSo
+    m_listCtrl->SetItemData(nIndex, nData);
+}
+
+bool CMainFrame::DeleteLine(uint256 hashKey)
+{
+    long nData = *(long*)&hashKey;
+
+    // Find item
+    int nIndex = -1;
+    while ((nIndex = m_listCtrl->FindItem(nIndex, nData)) != -1)
+        if (GetItemText(m_listCtrl, nIndex, 1) == hashKey.ToString())
+            break;
+
+    if (nIndex != -1)
+        m_listCtrl->DeleteItem(nIndex);
+
+    return nIndex != -1;
+}
+
+string FormatTxStatus(const CWalletTx& wtx)
+{
+    // Status
+    int nDepth = wtx.GetDepthInMainChain();
+    if (!wtx.IsFinal())
+        return strprintf("Open for %d blocks", nBestHeight - wtx.nLockTime);
+    {
+        if (wtx.nLockTime < 500000000)
+            return strprintf("Open for %d blocks", nBestHeight - wtx.nLockTime);
+        else
+            return strprintf("Open until %s", DateTimeStr(wtx.nLockTime).c_str());
+    }
+    else if (nDepth < 6)
+        return strprintf("%d/unconfirmed", nDepth);
+    else
+@@ -503,7 +526,11 @@ void CMainFrame::InsertTransaction(const CWalletTx& wtx, bool fNew, int nIndex)
+        // are special because if their block is not accepted, they are not valid.
+        //
+        if (wtx.GetDepthInMainChain() < 2)
+        {
+            // In case it was previously displayed
+            DeleteLine(hash);
+            return;
+        }
+    }
+
+    // Find the block the tx is in
+@@ -800,6 +827,17 @@ void CMainFrame::OnPaint(wxPaintEvent& event)
+    event.Skip();
+}
+
+void DelayedRepaint(void* parg)
+{
+    static bool fOneThread;
+    if (fOneThread)
+        return;
+    fOneThread = true;
+    Sleep(1000);
+    MainFrameRepaint();
+    fOneThread = false;
+}
+
+void CMainFrame::OnPaintListCtrl(wxPaintEvent& event)
+{
+    // Update listctrl contents
+@@ -824,7 +862,7 @@ void CMainFrame::OnPaintListCtrl(wxPaintEvent& event)
+    // Update status bar
+    string strGen = "";
+    if (fGenerateBitcoins)
+        strGen = "     Generating";
+        strGen = "    Generating";
+    if (fGenerateBitcoins && vNodes.empty())
+        strGen = "(not connected)";
+    m_statusBar->SetStatusText(strGen, 1);
+@@ -833,8 +871,16 @@ void CMainFrame::OnPaintListCtrl(wxPaintEvent& event)
+    m_statusBar->SetStatusText(strStatus, 2);
+
+    // Balance total
+    bool fRefreshed = false;
+    TRY_CRITICAL_BLOCK(cs_mapWallet)
+    {
+        m_staticTextBalance->SetLabel(FormatMoney(GetBalance()) + "  ");
+        fRefreshed = true;
+    }
+
+    // mapWallet was locked, try again later
+    if (!vWalletUpdated.empty() || !fRefreshed)
+        _beginthread(DelayedRepaint, 0, NULL);
+
+    m_listCtrl->OnPaint(event);
+}
+@@ -1414,7 +1460,7 @@ void COptionsDialog::OnButtonApply(wxCommandEvent& event)
+
+CAboutDialog::CAboutDialog(wxWindow* parent) : CAboutDialogBase(parent)
+{
+    m_staticTextVersion->SetLabel(strprintf("version 0.%d.%d Alpha", VERSION/100, VERSION%100));
+    m_staticTextVersion->SetLabel(strprintf("version 0.%d.%d Beta", VERSION/100, VERSION%100));
+
+    // Workaround until upgrade to wxWidgets supporting UTF-8
+    wxString str = m_staticTextMain->GetLabel();
+@@ -3358,6 +3404,8 @@ bool CMyApp::OnInit2()
+        return false;
+    }
+
+    //RandAddSeedPerfmon();
+
+    if (!StartNode(strErrors))
+        wxMessageBox(strErrors, "Bitcoin");
+
+@@ -3517,7 +3565,6 @@ void SetStartOnSystemStartup(bool fAutoStart)
+            // Get the current executable path
+            char pszExePath[MAX_PATH];
+            GetModuleFileName(NULL, pszExePath, sizeof(pszExePath));
+            _strlwr(pszExePath);
+
+            // Set the path to the shortcut target
+            psl->SetPath(pszExePath);
+            @@ -88,6 +88,7 @@ public:
+
+    void OnCrossThreadCall(wxCommandEvent& event);
+    void InsertLine(bool fNew, int nIndex, uint256 hashKey, string strSort, const wxString& str1, const wxString& str2, const wxString& str3, const wxString& str4, const wxString& str5);
+    bool DeleteLine(uint256 hashKey);
+    void InsertTransaction(const CWalletTx& wtx, bool fNew, int nIndex=-1);
+    void RefreshListCtrl();
+    void RefreshStatus();
