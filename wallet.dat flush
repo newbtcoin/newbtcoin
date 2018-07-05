@@ -1,0 +1,317 @@
+@@ -2518,8 +2518,7 @@ bool BitcoinMiner()
+
+int64 GetBalance()
+{
+    int64 nStart, nEnd;
+    QueryPerformanceCounter((LARGE_INTEGER*)&nStart);
+    int64 nStart = PerformanceCounter();
+
+    int64 nTotal = 0;
+    CRITICAL_BLOCK(cs_mapWallet)
+@@ -2533,8 +2532,7 @@ int64 GetBalance()
+        }
+    }
+
+    QueryPerformanceCounter((LARGE_INTEGER*)&nEnd);
+    ///printf(" GetBalance() time = %16I64d\n", nEnd - nStart);
+    ///printf(" GetBalance() time = %15"PRI64d"\n", PerformanceCounter() - nStart);
+    return nTotal;
+}
+
+@@ -344,7 +344,7 @@ public:
+    {
+        if (scriptPubKey.size() < 6)
+            return "CTxOut(error)";
+        return strprintf("CTxOut(nValue=%I64d.%08I64d, scriptPubKey=%s)", nValue / COIN, nValue % COIN, scriptPubKey.ToString().substr(0,24).c_str());
+        return strprintf("CTxOut(nValue=%"PRI64d".%08"PRI64d", scriptPubKey=%s)", nValue / COIN, nValue % COIN, scriptPubKey.ToString().substr(0,24).c_str());
+    }
+
+    void print() const
+    @@ -13,8 +13,8 @@ DEBUGFLAGS=/Zi /Od /D__WXDEBUG__
+
+
+
+INCLUDEPATHS=/I"/boost" /I"/DB/build_windows" /I"/OpenSSL/include" /I"/wxWidgets/lib/vc_lib/mswd" /I"/wxWidgets/include"
+LIBPATHS=/LIBPATH:"/DB/build_windows/$(BUILD)" /LIBPATH:"/OpenSSL/out" /LIBPATH:"/wxWidgets/lib/vc_lib"
+INCLUDEPATHS=/I"/boost" /I"/db/build_windows" /I"/openssl/include" /I"/wxwidgets/lib/vc_lib/mswd" /I"/wxwidgets/include"
+LIBPATHS=/LIBPATH:"/db/build_windows/$(BUILD)" /LIBPATH:"/openssl/out" /LIBPATH:"/wxwidgets/lib/vc_lib"
+LIBS= \
+    libdb47s$(D).lib \
+    libeay32.lib \
+    @@ -589,7 +589,7 @@ public:
+        // We're using mapAskFor as a priority queue,
+        // the key is the earliest time the request can be sent
+        int64& nRequestTime = mapAlreadyAskedFor[inv];
+        printf("askfor %s  %I64d\n", inv.ToString().c_str(), nRequestTime);
+        printf("askfor %s  %"PRI64d"\n", inv.ToString().c_str(), nRequestTime);
+
+        // Make sure not to reuse time indexes to keep things in the same order
+        int64 nNow = (GetTime() - 1) * 1000000;
+       
+       @@ -3414,28 +3414,25 @@ bool CMyApp::OnInit2()
+    //
+    bool fFirstRun;
+    string strErrors;
+    int64 nStart, nEnd;
+    int64 nStart;
+
+    printf("Loading addresses...\n");
+    QueryPerformanceCounter((LARGE_INTEGER*)&nStart);
+    nStart = PerformanceCounter();
+    if (!LoadAddresses())
+        strErrors += "Error loading addr.dat      \n";
+    QueryPerformanceCounter((LARGE_INTEGER*)&nEnd);
+    printf(" addresses   %20I64d\n", nEnd - nStart);
+    printf(" addresses   %15"PRI64d"\n", PerformanceCounter() - nStart);
+
+    printf("Loading block index...\n");
+    QueryPerformanceCounter((LARGE_INTEGER*)&nStart);
+    nStart = PerformanceCounter();
+    if (!LoadBlockIndex())
+        strErrors += "Error loading blkindex.dat      \n";
+    QueryPerformanceCounter((LARGE_INTEGER*)&nEnd);
+    printf(" block index %20I64d\n", nEnd - nStart);
+    printf(" block index %15"PRI64d"\n", PerformanceCounter() - nStart);
+
+    printf("Loading wallet...\n");
+    QueryPerformanceCounter((LARGE_INTEGER*)&nStart);
+    nStart = PerformanceCounter();
+    if (!LoadWallet(fFirstRun))
+        strErrors += "Error loading wallet.dat      \n";
+    QueryPerformanceCounter((LARGE_INTEGER*)&nEnd);
+    printf(" wallet      %20I64d\n", nEnd - nStart);
+    printf(" wallet      %15"PRI64d"\n", PerformanceCounter() - nStart);
+
+    printf("Done loading\n");
+
+@@ -3742,7 +3739,7 @@ void ThreadRandSendTest(void* parg)
+        return;
+    }
+
+    loop
+    while (!fShutdown)
+    {
+        Sleep(GetRand(30) * 1000 + 100);
+
+@@ -3767,6 +3764,8 @@ void ThreadRandSendTest(void* parg)
+        CScript scriptPubKey;
+        scriptPubKey << OP_DUP << OP_HASH160 << hash160 << OP_EQUALVERIFY << OP_CHECKSIG;
+
+        if (fShutdown)
+            return;
+        if (!SendMoney(scriptPubKey, nValue, wtx))
+            return;
+    }
+@@ -3776,8 +3775,6 @@ void ThreadRandSendTest(void* parg)
+// randsendtest to any connected node
+void RandSend()
+{
+    CWalletTx wtx;
+
+    while (vNodes.empty())
+        Sleep(1000);
+    CAddress addr;
+@@ -3785,6 +3782,7 @@ void RandSend()
+        addr = vNodes[GetRand(vNodes.size())]->addr;
+
+    // Message
+    CWalletTx wtx;
+    wtx.mapValue["to"] = addr.ToString();
+    wtx.mapValue["from"] = addrLocalHost.ToString();
+    static int nRep;
+@@ -3799,6 +3797,8 @@ void RandSend()
+    }
+
+    // Send to IP address
+    if (fShutdown)
+        return;
+    CSendingDialog* pdialog = new CSendingDialog(pframeMain, addr, nValue, wtx);
+    if (!pdialog->Show())
+        wxMessageBox("ShowModal Failed  ");
+        
+        
+        @@ -14,8 +14,7 @@ bool fPrintToConsole = false;
+
+// Init openssl library multithreading support
+static wxMutex** ppmutexOpenSSL;
+
+void win32_locking_callback(int mode, int i, const char* file, int line)
+void locking_callback(int mode, int i, const char* file, int line)
+{
+    if (mode & CRYPTO_LOCK)
+        ppmutexOpenSSL[i]->Lock();
+@@ -33,7 +32,7 @@ public:
+        ppmutexOpenSSL = (wxMutex**)OPENSSL_malloc(CRYPTO_num_locks() * sizeof(wxMutex*));
+        for (int i = 0; i < CRYPTO_num_locks(); i++)
+            ppmutexOpenSSL[i] = new wxMutex();
+        CRYPTO_set_locking_callback(win32_locking_callback);
+        CRYPTO_set_locking_callback(locking_callback);
+
+        // Seed random number generator with screen scrape and other hardware sources
+        RAND_screen();
+@@ -45,7 +44,7 @@ public:
+    {
+        // Shutdown openssl library multithreading support
+        CRYPTO_set_locking_callback(NULL);
+        for (int i =0 ; i < CRYPTO_num_locks(); i++)
+        for (int i = 0; i < CRYPTO_num_locks(); i++)
+            delete ppmutexOpenSSL[i];
+        OPENSSL_free(ppmutexOpenSSL);
+    }
+@@ -62,10 +61,9 @@ instance_of_cinit;
+void RandAddSeed()
+{
+    // Seed with CPU performance counter
+    LARGE_INTEGER PerformanceCount;
+    QueryPerformanceCounter(&PerformanceCount);
+    RAND_add(&PerformanceCount, sizeof(PerformanceCount), 1.5);
+    memset(&PerformanceCount, 0, sizeof(PerformanceCount));
+    int64 nCounter = PerformanceCounter();
+    RAND_add(&nCounter, sizeof(nCounter), 1.5);
+    memset(&nCounter, 0, sizeof(nCounter));
+}
+
+void RandAddSeedPerfmon()
+@@ -196,7 +194,7 @@ void ParseString(const string& str, char c, vector<string>& v)
+string FormatMoney(int64 n, bool fPlus)
+{
+    n /= CENT;
+    string str = strprintf("%I64d.%02I64d", (n > 0 ? n : -n)/100, (n > 0 ? n : -n)%100);
+    string str = strprintf("%"PRI64d".%02"PRI64d, (n > 0 ? n : -n)/100, (n > 0 ? n : -n)%100);
+    for (int i = 6; i < str.size(); i += 4)
+        if (isdigit(str[str.size() - i - 1]))
+            str.insert(str.size() - i, 1, ',');
+@@ -435,7 +433,7 @@ void AddTimeData(unsigned int ip, int64 nTime)
+    if (vTimeOffsets.empty())
+        vTimeOffsets.push_back(0);
+    vTimeOffsets.push_back(nOffsetSample);
+    printf("Added time data, samples %d, offset %+I64d (%+I64d minutes)\n", vTimeOffsets.size(), vTimeOffsets.back(), vTimeOffsets.back()/60);
+    printf("Added time data, samples %d, offset %+"PRI64d" (%+"PRI64d" minutes)\n", vTimeOffsets.size(), vTimeOffsets.back(), vTimeOffsets.back()/60);
+    if (vTimeOffsets.size() >= 5 && vTimeOffsets.size() % 2 == 1)
+    {
+        sort(vTimeOffsets.begin(), vTimeOffsets.end());
+@@ -449,7 +447,7 @@ void AddTimeData(unsigned int ip, int64 nTime)
+            ///    to make sure it doesn't get changed again
+        }
+        foreach(int64 n, vTimeOffsets)
+            printf("%+I64d  ", n);
+        printf("|  nTimeOffset = %+I64d  (%+I64d minutes)\n", nTimeOffset, nTimeOffset/60);
+            printf("%+"PRI64d"  ", n);
+        printf("|  nTimeOffset = %+"PRI64d"  (%+"PRI64d" minutes)\n", nTimeOffset, nTimeOffset/60);
+    }
+}
+@@ -13,7 +13,6 @@ typedef unsigned long long  uint64;
+#if defined(_MSC_VER) && _MSC_VER < 1300
+#define for  if (false) ; else for
+#endif
+
+#ifndef _MSC_VER
+#define __forceinline  inline
+#endif
+@@ -25,25 +24,22 @@ typedef unsigned long long  uint64;
+#define UBEGIN(a)           ((unsigned char*)&(a))
+#define UEND(a)             ((unsigned char*)&((&(a))[1]))
+#define ARRAYLEN(array)     (sizeof(array)/sizeof((array)[0]))
+
+#ifdef _WINDOWS
+#define printf              OutputDebugStringF
+#endif
+
+#ifdef snprintf
+#undef snprintf
+#endif
+#define snprintf my_snprintf
+
+#ifndef PRId64
+#ifndef PRI64d
+#if defined(_MSC_VER) || defined(__BORLANDC__) || defined(__MSVCRT__)
+#define PRId64  "I64d"
+#define PRIu64  "I64u"
+#define PRIx64  "I64x"
+#define PRI64d  "I64d"
+#define PRI64u  "I64u"
+#define PRI64x  "I64x"
+#else
+#define PRId64  "lld"
+#define PRIu64  "llu"
+#define PRIx64  "llx"
+#define PRI64d  "lld"
+#define PRI64u  "llu"
+#define PRI64x  "llx"
+#endif
+#endif
+
+@@ -64,8 +60,6 @@ inline T& REF(const T& val)
+
+
+
+
+
+extern bool fDebug;
+extern bool fPrintToDebugger;
+extern bool fPrintToConsole;
+@@ -101,9 +95,7 @@ void AddTimeData(unsigned int ip, int64 nTime);
+
+
+
+
+// Wrapper to automatically initialize critical section
+// Could use wxCriticalSection for portability, but it doesn't support TryEnterCriticalSection
+// Wrapper to automatically initialize critical sections
+class CCriticalSection
+{
+#ifdef __WXMSW__
+@@ -191,6 +183,7 @@ inline int OutputDebugStringF(const char* pszFormat, ...)
+        }
+    }
+
+#ifdef __WXMSW__
+    if (fPrintToDebugger)
+    {
+        // accumulate a line at a time
+@@ -231,6 +224,7 @@ inline int OutputDebugStringF(const char* pszFormat, ...)
+        }
+    }
+#endif
+#endif
+
+    if (fPrintToConsole)
+    {
+@@ -254,7 +248,7 @@ inline int OutputDebugStringF(const char* pszFormat, ...)
+
+inline string i64tostr(int64 n)
+{
+    return strprintf("%"PRId64, n);
+    return strprintf("%"PRI64d, n);
+}
+
+inline string itostr(int n)
+@@ -328,6 +322,20 @@ inline void PrintHex(vector<unsigned char> vch, const char* pszFormat="%s", bool
+    printf(pszFormat, HexStr(vch, fSpaces).c_str());
+}
+
+inline int64 PerformanceCounter()
+{
+    int64 nCounter = 0;
+    QueryPerformanceCounter((LARGE_INTEGER*)&nCounter);
+    return nCounter;
+}
+
+#ifndef __WXMSW__
+inline void Sleep(unsigned int nMilliseconds)
+{
+    wxMilliSleep(nMilliseconds);
+}
+#endif
+
+
+
+
+@@ -370,6 +378,7 @@ inline void heapchk()
+
+
+
+
+template<typename T1>
+inline uint256 Hash(const T1 pbegin, const T1 pend)
+{
