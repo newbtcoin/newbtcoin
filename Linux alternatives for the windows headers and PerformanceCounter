@@ -1,0 +1,102 @@
+@@ -25,20 +25,13 @@
+#include <openssl/evp.h>
+#include <openssl/rand.h>
+#include <openssl/sha.h>
+#include <openssl/ripemd.h>
+#include <windows.h>
+#include <winsock2.h>
+#include <mswsock.h>
+#include <shlobj.h>
+#include <shlwapi.h>
+#include <openssl/ripemd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <io.h>
+#include <math.h>
+#include <limits.h>
+#include <float.h>
+#include <assert.h>
+#include <process.h>
+#include <malloc.h>
+#include <memory>
+#define BOUNDSCHECK 1
+@@ -56,7 +49,23 @@
+#include <boost/tuple/tuple.hpp>
+#include <boost/tuple/tuple_comparison.hpp>
+#include <boost/tuple/tuple_io.hpp>
+#include <boost/array.hpp>
+#include <boost/array.hpp>
+
+#ifdef __WXMSW__
+#include <windows.h>
+#include <winsock2.h>
+#include <mswsock.h>
+#include <shlobj.h>
+#include <shlwapi.h>
+#include <io.h>
+#include <process.h>
+#else
+#include <sys/time.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#endif
+
+#pragma hdrstop
+using namespace std;
+using namespace boost;
+@@ -1,6 +1,11 @@
+// Copyright (c) 2009 Satoshi Nakamoto
+// Distributed under the MIT/X11 software license, see the accompanying
+// file license.txt or http://www.opensource.org/licenses/mit-license.php.
+
+#ifndef __WXMSW__
+#define closesocket(s) close(s)
+typedef u_int SOCKET;
+#endif
+
+extern bool RecvLine(SOCKET hSocket, string& strLine);
+extern void ThreadIRCSeed(void* parg);
+@@ -1399,7 +1399,7 @@ string GetAppDir()
+bool CheckDiskSpace(int64 nAdditionalBytes)
+{
+    wxLongLong nFreeBytesAvailable = 0;
+    if (!wxGetDiskSpace(GetDataDir(), NULL, &nFreeBytesAvailable))
+    if (!wxGetDiskSpace(wxStandardPaths::Get().GetDataDir(), NULL, &nFreeBytesAvailable))
+    {
+        printf("ERROR: wxGetDiskSpace() failed\n");
+        return true;
+     @@ -1,6 +1,12 @@
+// Copyright (c) 2009 Satoshi Nakamoto
+// Distributed under the MIT/X11 software license, see the accompanying
+// file license.txt or http://www.opensource.org/licenses/mit-license.php.
+
+#ifndef __WXMSW__
+#define closesocket(s) close(s)
+#define INVALID_SOCKET (SOCKET)(~0)
+typedef u_int SOCKET;
+#endif
+
+class CMessageHeader;
+class CAddress;
+@@ -321,11 +321,19 @@ inline void PrintHex(vector<unsigned char> vch, const char* pszFormat="%s", bool
+{
+    printf(pszFormat, HexStr(vch, fSpaces).c_str());
+}
+
+
+inline int64 PerformanceCounter()
+{
+    int64 nCounter = 0;
+    QueryPerformanceCounter((LARGE_INTEGER*)&nCounter);
+    int64 nCounter = 0;
+#ifdef __WXMSW__
+    QueryPerformanceCounter((LARGE_INTEGER*)&nCounter);
+#else
+	// this could be changed to reading /dev/urandom
+	timeval t;
+	gettimeofday(&t, NULL);
+	nCounter += t.tv_sec * 1000000 + t.tv_usec;
+#endif
+    return nCounter;
+}
