@@ -1,0 +1,167 @@
+@@ -40,7 +40,7 @@ bool DecodeAddress(string str, CAddress& addr)
+        return false;
+    memcpy(&tmp, &vch[0], sizeof(tmp));
+
+    addr  = CAddress(tmp.ip, tmp.port);
+    addr = CAddress(tmp.ip, tmp.port, NODE_NETWORK);
+    return true;
+}
+
+@@ -163,6 +163,7 @@ void ThreadIRCSeed(void* parg)
+    int nErrorWait = 10;
+    int nRetryWait = 10;
+
+    // IRC server blocks TOR users
+    if (fUseProxy && addrProxy.port == htons(9050))
+        return;
+
+@@ -237,14 +238,14 @@ void ThreadIRCSeed(void* parg)
+            {
+                // index 7 is limited to 16 characters
+                // could get full length name at index 10, but would be different from join messages
+                strcpy(pszName, vWords[7].c_str());
+                strlcpy(pszName, vWords[7].c_str(), sizeof(pszName));
+                printf("IRC got who\n");
+            }
+
+            if (vWords[1] == "JOIN" && vWords[0].size() > 1)
+            {
+                // :username!username@50000007.F000000B.90000002.IP JOIN :#channelname
+                strcpy(pszName, vWords[0].c_str() + 1);
+                strlcpy(pszName, vWords[0].c_str() + 1, sizeof(pszName));
+                if (strchr(pszName, '!'))
+                    *strchr(pszName, '!') = '\0';
+                printf("IRC got join\n");
+          @@ -34,7 +34,6 @@ extern int nBestHeight;
+extern uint256 hashBestChain;
+extern CBlockIndex* pindexBest;
+extern unsigned int nTransactionsUpdated;
+extern string strSetDataDir;
+extern int nDropMessagesTest;
+
+// Settings
+@@ -50,7 +49,6 @@ extern int nLimitProcessors;
+
+
+
+string GetAppDir();
+bool CheckDiskSpace(int64 nAdditionalBytes=0);
+FILE* OpenBlockFile(unsigned int nFile, unsigned int nBlockPos, const char* pszMode="rb");
+FILE* AppendBlockFile(unsigned int& nFileRet);
+@@ -405,10 +403,10 @@ public:
+    {
+        // Time based nLockTime implemented in 0.1.6,
+        // do not use time based until most 0.1.5 nodes have upgraded.
+        if (nBlockTime == 0)
+            nBlockTime = GetAdjustedTime();
+        if (nLockTime == 0)
+            return true;
+        if (nBlockTime == 0)
+            nBlockTime = GetAdjustedTime();
+        if (nLockTime < (nLockTime < 500000000 ? nBestHeight : nBlockTime))
+            return true;
+        foreach(const CTxIn& txin, vin)
+@@ -627,6 +625,8 @@ public:
+
+    // memory only
+    mutable bool fMerkleVerified;
+    mutable bool fGetCreditCached;
+    mutable int64 nGetCreditCached;
+
+
+    CMerkleTx()
+@@ -644,14 +644,22 @@ public:
+        hashBlock = 0;
+        nIndex = -1;
+        fMerkleVerified = false;
+        fGetCreditCached = false;
+        nGetCreditCached = 0;
+    }
+
+    int64 GetCredit() const
+    int64 GetCredit(bool fUseCache=false) const
+    {
+        // Must wait until coinbase is safely deep enough in the chain before valuing it
+        if (IsCoinBase() && GetBlocksToMaturity() > 0)
+            return 0;
+        return CTransaction::GetCredit();
+
+        // GetBalance can assume transactions in mapWallet won't change
+        if (fUseCache && fGetCreditCached)
+            return nGetCreditCached;
+        nGetCreditCached = CTransaction::GetCredit();
+        fGetCreditCached = true;
+        return nGetCreditCached;
+    }
+
+    IMPLEMENT_SERIALIZE
+    @@ -21,8 +21,7 @@ bool OpenNetworkConnection(const CAddress& addrConnect);
+bool fClient = false;
+uint64 nLocalServices = (fClient ? 0 : NODE_NETWORK);
+CAddress addrLocalHost(0, DEFAULT_PORT, nLocalServices);
+CNode nodeLocalHost(INVALID_SOCKET, CAddress("127.0.0.1", nLocalServices));
+CNode* pnodeLocalHost = &nodeLocalHost;
+CNode* pnodeLocalHost = NULL;
+uint64 nLocalHostNonce = 0;
+bool fShutdown = false;
+array<int, 10> vnThreadsRunning;
+@@ -129,7 +128,7 @@ bool GetMyExternalIP2(const CAddress& addrConnect, const char* pszGet, const cha
+            strLine = wxString(strLine).Trim();
+            CAddress addr(strLine.c_str());
+            printf("GetMyExternalIP() received [%s] %s\n", strLine.c_str(), addr.ToString().c_str());
+            if (addr.ip == 0 || !addr.IsRoutable())
+            if (addr.ip == 0 || addr.ip == INADDR_NONE || !addr.IsRoutable())
+                return false;
+            ipRet = addr.ip;
+            return true;
+@@ -740,10 +739,29 @@ void ThreadOpenConnections2(void* parg)
+    printf("ThreadOpenConnections started\n");
+
+    // Connect to one specified address
+    while (mapArgs.count("/connect"))
+    while (mapArgs.count("-connect"))
+    {
+        OpenNetworkConnection(CAddress(mapArgs["/connect"].c_str()));
+        Sleep(10000);
+        OpenNetworkConnection(CAddress(mapArgs["-connect"]));
+        for (int i = 0; i < 10; i++)
+        {
+            Sleep(1000);
+            CheckForShutdown(1);
+        }
+    }
+
+    // Connect to manually added nodes first
+    if (mapArgs.count("-addnode"))
+    {
+        foreach(string strAddr, mapMultiArgs["-addnode"])
+        {
+            CAddress addr(strAddr, NODE_NETWORK);
+            if (addr.IsValid())
+            {
+                OpenNetworkConnection(addr);
+                Sleep(1000);
+                CheckForShutdown(1);
+            }
+        }
+    }
+
+    // Initiate network connections
+@@ -967,6 +985,8 @@ void ThreadMessageHandler2(void* parg)
+
+bool StartNode(string& strError)
+{
+    if (pnodeLocalHost == NULL)
+        pnodeLocalHost = new CNode(INVALID_SOCKET, CAddress("127.0.0.1", nLocalServices));
+    strError = "";
+
+    // Sockets startup
+@@ -1031,7 +1051,7 @@ bool StartNode(string& strError)
+        printf("%s\n", strError.c_str());
+        return false;
+    }
+    printf("bound to addrLocalHost = %s\n\n", addrLocalHost.ToString().c_str());
+    printf("bound to addrLocalHost = %s\n", addrLocalHost.ToString().c_str());
+
+    // Listen for incoming connections
+    if (listen(hListenSocket, SOMAXCONN) == SOCKET_ERROR)
