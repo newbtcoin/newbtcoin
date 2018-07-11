@@ -1,0 +1,239 @@
+@@ -83,15 +83,14 @@ public:
+    bool fRefreshListCtrl;
+    bool fRefreshListCtrlRunning;
+    bool fOnSetFocusAddress;
+    CBlockIndex* pindexBestLast;
+    set<uint256> setUnmaturedDisplayed;
+    unsigned int nListViewUpdated;
+
+    void OnCrossThreadCall(wxCommandEvent& event);
+    void InsertLine(bool fNew, int nIndex, uint256 hashKey, string strSort, const wxString& str1, const wxString& str2, const wxString& str3, const wxString& str4, const wxString& str5);
+    bool DeleteLine(uint256 hashKey);
+    bool InsertTransaction(const CWalletTx& wtx, bool fNew, int nIndex=-1);
+    void RefreshListCtrl();
+    void RefreshStatus();
+    void RefreshStatusColumn();
+};
+
+@@ -5,9 +5,13 @@
+#include "headers.h"
+
+
+map<string, string> mapArgs;
+map<string, vector<string> > mapMultiArgs;
+bool fDebug = false;
+bool fPrintToDebugger = false;
+bool fPrintToConsole = false;
+char pszSetDataDir[MAX_PATH] = "";
+
+
+
+
+@@ -68,6 +72,8 @@ void RandAddSeed()
+
+void RandAddSeedPerfmon()
+{
+#ifdef __WXMSW__
+    // Don't need this on Linux, OpenSSL automatically uses /dev/urandom
+    // This can take up to 2 seconds, so only do it every 10 minutes
+    static int64 nLastPerfmon;
+    if (GetTime() < nLastPerfmon + 10 * 60)
+@@ -95,6 +101,7 @@ void RandAddSeedPerfmon()
+        strftime(pszTime, sizeof(pszTime), "%x %H:%M:%S", ptmTime);
+        printf("%s RandAddSeed() %d bytes\n", pszTime, nSize);
+    }
+#endif
+}
+
+
+@@ -304,6 +311,32 @@ vector<unsigned char> ParseHex(const std::string& str)
+}
+
+
+void ParseParameters(int argc, char* argv[])
+{
+    mapArgs.clear();
+    mapMultiArgs.clear();
+    for (int i = 0; i < argc; i++)
+    {
+        char psz[10000];
+        strlcpy(psz, argv[i], sizeof(psz));
+        char* pszValue = "";
+        if (strchr(psz, '='))
+        {
+            pszValue = strchr(psz, '=');
+            *pszValue++ = '\0';
+        }
+        strlwr(psz);
+        #ifdef __WXMSW__
+        if (psz[0] == '/')
+            psz[0] = '-';
+        #endif
+        mapArgs[psz] = pszValue;
+        mapMultiArgs[psz].push_back(pszValue);
+    }
+}
+
+
+
+
+
+
+@@ -346,15 +379,6 @@ void PrintException(std::exception* pex, const char* pszThread)
+
+
+
+bool FileExists(const char* psz)
+{
+#ifdef WIN32
+    return GetFileAttributes(psz) != -1;
+#else
+    return access(psz, 0) != -1;
+#endif
+}
+
+int GetFilesize(FILE* file)
+{
+    int nSavePos = ftell(file);
+@@ -365,6 +389,46 @@ int GetFilesize(FILE* file)
+    return nFilesize;
+}
+
+void GetDataDir(char* pszDir)
+{
+    // pszDir must be at least MAX_PATH length.
+    if (pszSetDataDir[0] != 0)
+    {
+        strlcpy(pszDir, pszSetDataDir, MAX_PATH);
+        static bool fMkdirDone;
+        if (!fMkdirDone)
+        {
+            fMkdirDone = true;
+            _mkdir(pszDir);
+        }
+    }
+    else
+    {
+        // This can be called during exceptions by printf, so we cache the
+        // value so we don't have to do memory allocations after that.
+        // wxStandardPaths::GetUserDataDir
+        //  Return the directory for the user-dependent application data files:
+        //  Unix: ~/.appname
+        //  Windows: C:\Documents and Settings\username\Application Data\appname
+        //  Mac: ~/Library/Application Support/appname
+        static char pszCachedDir[MAX_PATH];
+        if (pszCachedDir[0] == 0)
+        {
+            strlcpy(pszCachedDir, wxStandardPaths::Get().GetUserDataDir().c_str(), sizeof(pszCachedDir));
+            _mkdir(pszCachedDir);
+        }
+        strlcpy(pszDir, pszCachedDir, MAX_PATH);
+    }
+
+}
+
+string GetDataDir()
+{
+    char pszDir[MAX_PATH];
+    GetDataDir(pszDir);
+    return pszDir;
+}
+
+
+@@ -54,16 +54,23 @@ inline T& REF(const T& val)
+    return (T&)val;
+}
+
+#ifndef __WXMSW__
+#define closesocket(s)  close(s)
+#define INVALID_SOCKET  (SOCKET)(~0)
+typedef u_int SOCKET;
+#endif
+
+
+
+
+
+
+extern map<string, string> mapArgs;
+extern map<string, vector<string> > mapMultiArgs;
+extern bool fDebug;
+extern bool fPrintToDebugger;
+extern bool fPrintToConsole;
+extern map<string, string> mapArgs;
+extern char pszSetDataDir[MAX_PATH];
+
+void RandAddSeed();
+void RandAddSeedPerfmon();
+@@ -77,8 +84,10 @@ string FormatMoney(int64 n, bool fPlus=false);
+bool ParseMoney(const char* pszIn, int64& nRet);
+vector<unsigned char> ParseHex(const char* psz);
+vector<unsigned char> ParseHex(const std::string& str);
+bool FileExists(const char* psz);
+void ParseParameters(int argc, char* argv[]);
+int GetFilesize(FILE* file);
+void GetDataDir(char* pszDirRet);
+string GetDataDir();
+uint64 GetRand(uint64 nMax);
+int64 GetTime();
+int64 GetAdjustedTime();
+@@ -172,9 +181,14 @@ inline int OutputDebugStringF(const char* pszFormat, ...)
+    if (!fPrintToConsole)
+    {
+        // print to debug.log
+        FILE* fileout = fopen("debug.log", "a");
+        char pszFile[MAX_PATH+100];
+        GetDataDir(pszFile);
+        strlcat(pszFile, "\\debug.log", sizeof(pszFile));
+        FILE* fileout = fopen(pszFile, "a");
+        if (fileout)
+        {
+            //// Debug print useful for profiling
+            //fprintf(fileout, " %"PRI64d" ", wxGetLocalTimeMillis().GetValue());
+            va_list arg_ptr;
+            va_start(arg_ptr, pszFormat);
+            ret = vfprintf(fileout, pszFormat, arg_ptr);
+@@ -321,22 +335,25 @@ inline void PrintHex(vector<unsigned char> vch, const char* pszFormat="%s", bool
+{
+    printf(pszFormat, HexStr(vch, fSpaces).c_str());
+}
+
+
+inline int64 PerformanceCounter()
+{
+    int64 nCounter = 0;
+    int64 nCounter = 0;
+#ifdef __WXMSW__
+    QueryPerformanceCounter((LARGE_INTEGER*)&nCounter);
+    QueryPerformanceCounter((LARGE_INTEGER*)&nCounter);
+#else
+	// this could be changed to reading /dev/urandom
+	timeval t;
+	gettimeofday(&t, NULL);
+	nCounter += t.tv_sec * 1000000 + t.tv_usec;
+    timeval t;
+    gettimeofday(&t, NULL);
+    nCounter = t.tv_sec * 1000000 + t.tv_usec;
+#endif
+    return nCounter;
+}
+
+inline int64 GetTimeMillis()
+{
+    return wxGetLocalTimeMillis().GetValue();
+}
+
+#ifndef __WXMSW__
+inline void Sleep(unsigned int nMilliseconds)
+{
+@@ -354,8 +371,10 @@ inline void Sleep(unsigned int nMilliseconds)
+
+inline void heapchk()
+{
+#ifdef __WXMSW__
+    if (_heapchk() != _HEAPOK)
+        DebugBreak();
+#endif
+}
+
+// Randomize the stack to help protect against buffer overrun exploits
