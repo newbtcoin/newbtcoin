@@ -1,0 +1,590 @@
+@@ -84,7 +84,7 @@ CMainFrameBase::CMainFrameBase( wxWindow* parent, wxWindowID id, const wxString&
+	m_staticText32->Wrap( -1 );
+	bSizer85->Add( m_staticText32, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
+	
+	m_textCtrlAddress = new wxTextCtrl( this, wxID_TEXTCTRLADDRESS, wxEmptyString, wxDefaultPosition, wxSize( 250,-1 ), wxTE_READONLY );
+	m_textCtrlAddress = new wxTextCtrl( this, wxID_TEXTCTRLADDRESS, wxEmptyString, wxDefaultPosition, wxSize( 340,-1 ), wxTE_READONLY );
+	m_textCtrlAddress->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_MENU ) );
+	
+	bSizer85->Add( m_textCtrlAddress, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxLEFT, 5 );
+@@ -143,7 +143,7 @@ CMainFrameBase::CMainFrameBase( wxWindow* parent, wxWindowID id, const wxString&
+	wxBoxSizer* bSizer157;
+	bSizer157 = new wxBoxSizer( wxVERTICAL );
+	
+	m_listCtrl = new wxListCtrl( m_panel7, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SORT_DESCENDING|wxALWAYS_SHOW_SB );
+	m_listCtrl = new wxListCtrl( m_panel7, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SORT_DESCENDING|wxVSCROLL );
+	bSizer157->Add( m_listCtrl, 1, wxEXPAND|wxALL, 5 );
+	
+	m_panel7->SetSizer( bSizer157 );
+@@ -343,7 +343,7 @@ CTxDetailsDialogBase::CTxDetailsDialogBase( wxWindow* parent, wxWindowID id, con
+	wxBoxSizer* bSizer65;
+	bSizer65 = new wxBoxSizer( wxVERTICAL );
+	
+	m_buttonOK = new wxButton( this, wxID_OK, wxT("OK"), wxDefaultPosition, wxSize( 85,25 ), 0 );
+	m_buttonOK = new wxButton( this, wxID_OK, wxT("OK"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	bSizer65->Add( m_buttonOK, 0, wxALL, 5 );
+	
+	bSizer64->Add( bSizer65, 0, wxALIGN_RIGHT, 5 );
+@@ -520,17 +520,13 @@ COptionsDialogBase::COptionsDialogBase( wxWindow* parent, wxWindowID id, const w
+	wxBoxSizer* bSizer58;
+	bSizer58 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_buttonOK = new wxButton( this, wxID_OK, wxT("OK"), wxDefaultPosition, wxSize( 85,25 ), 0 );
+	m_buttonOK = new wxButton( this, wxID_OK, wxT("OK"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	bSizer58->Add( m_buttonOK, 0, wxALL, 5 );
+	
+	m_buttonCancel = new wxButton( this, wxID_CANCEL, wxT("Cancel"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	m_buttonCancel->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer58->Add( m_buttonCancel, 0, wxALL, 5 );
+	
+	m_buttonApply = new wxButton( this, wxID_APPLY, wxT("&Apply"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	m_buttonApply->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer58->Add( m_buttonApply, 0, wxALL, 5 );
+	
+	bSizer55->Add( bSizer58, 0, wxALIGN_RIGHT, 5 );
+@@ -622,7 +618,7 @@ CAboutDialogBase::CAboutDialogBase( wxWindow* parent, wxWindowID id, const wxStr
+	
+	bSizer61->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_buttonOK = new wxButton( this, wxID_OK, wxT("OK"), wxDefaultPosition, wxSize( 85,25 ), 0 );
+	m_buttonOK = new wxButton( this, wxID_OK, wxT("OK"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	bSizer61->Add( m_buttonOK, 0, wxALL, 5 );
+	
+	bSizer60->Add( bSizer61, 0, wxALIGN_RIGHT|wxEXPAND, 5 );
+@@ -767,13 +763,10 @@ CSendDialogBase::CSendDialogBase( wxWindow* parent, wxWindowID id, const wxStrin
+	
+	m_buttonSend = new wxButton( this, wxID_BUTTONSEND, wxT("&Send"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	m_buttonSend->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxEmptyString ) );
+	m_buttonSend->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer23->Add( m_buttonSend, 0, wxALL, 5 );
+	
+	m_buttonCancel = new wxButton( this, wxID_CANCEL, wxT("Cancel"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	m_buttonCancel->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer23->Add( m_buttonCancel, 0, wxALL, 5 );
+	
+	bSizer21->Add( bSizer23, 0, wxEXPAND, 5 );
+@@ -833,13 +826,10 @@ CSendingDialogBase::CSendingDialogBase( wxWindow* parent, wxWindowID id, const w
+	
+	m_buttonOK = new wxButton( this, wxID_ANY, wxT("OK"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonOK->Enable( false );
+	m_buttonOK->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer69->Add( m_buttonOK, 0, wxALL, 5 );
+	
+	m_buttonCancel = new wxButton( this, wxID_CANCEL, wxT("Cancel"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	m_buttonCancel->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer69->Add( m_buttonCancel, 0, wxALL, 5 );
+	
+	bSizer68->Add( bSizer69, 0, wxEXPAND, 5 );
+@@ -887,28 +877,19 @@ CYourAddressDialogBase::CYourAddressDialogBase( wxWindow* parent, wxWindowID id,
+	bSizer69->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_buttonRename = new wxButton( this, wxID_BUTTONRENAME, wxT("&Edit..."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonRename->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer69->Add( m_buttonRename, 0, wxALL, 5 );
+	
+	m_buttonNew = new wxButton( this, wxID_BUTTONNEW, wxT("&New Address..."), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	m_buttonNew->SetMinSize( wxSize( 110,25 ) );
+	
+	bSizer69->Add( m_buttonNew, 0, wxALL, 5 );
+	
+	m_buttonCopy = new wxButton( this, wxID_BUTTONCOPY, wxT("&Copy to Clipboard"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	m_buttonCopy->SetMinSize( wxSize( 120,25 ) );
+	
+	bSizer69->Add( m_buttonCopy, 0, wxALL, 5 );
+	
+	m_buttonOK = new wxButton( this, wxID_OK, wxT("OK"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonOK->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer69->Add( m_buttonOK, 0, wxALL, 5 );
+	
+	m_buttonCancel = new wxButton( this, wxID_CANCEL, wxT("Cancel"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	m_buttonCancel->Hide();
+	m_buttonCancel->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer69->Add( m_buttonCancel, 0, wxALL, 5 );
+	
+@@ -969,28 +950,18 @@ CAddressBookDialogBase::CAddressBookDialogBase( wxWindow* parent, wxWindowID id,
+	bSizer69->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_buttonEdit = new wxButton( this, wxID_BUTTONEDIT, wxT("&Edit..."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonEdit->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer69->Add( m_buttonEdit, 0, wxALL, 5 );
+	
+	m_buttonNew = new wxButton( this, wxID_BUTTONNEW, wxT("&New Address..."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonNew->SetMinSize( wxSize( 110,25 ) );
+	
+	bSizer69->Add( m_buttonNew, 0, wxALL, 5 );
+	
+	m_buttonDelete = new wxButton( this, wxID_BUTTONDELETE, wxT("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonDelete->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer69->Add( m_buttonDelete, 0, wxALL, 5 );
+	
+	m_buttonOK = new wxButton( this, wxID_OK, wxT("OK"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	m_buttonOK->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer69->Add( m_buttonOK, 0, wxALL, 5 );
+	
+	m_buttonCancel = new wxButton( this, wxID_CANCEL, wxT("Cancel"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	m_buttonCancel->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer69->Add( m_buttonCancel, 0, wxALL, 5 );
+	
+	bSizer68->Add( bSizer69, 0, wxEXPAND, 5 );
+@@ -1389,18 +1360,12 @@ CEditProductDialogBase::CEditProductDialogBase( wxWindow* parent, wxWindowID id,
+	bSizer26 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_buttonOK = new wxButton( this, wxID_BUTTONSEND, wxT("&Send"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonOK->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer26->Add( m_buttonOK, 0, wxALL, 5 );
+	
+	m_buttonPreview = new wxButton( this, wxID_BUTTONPREVIEW, wxT("&Preview"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonPreview->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer26->Add( m_buttonPreview, 0, wxALL, 5 );
+	
+	m_buttonCancel = new wxButton( this, wxID_CANCEL, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonCancel->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer26->Add( m_buttonCancel, 0, wxALL, 5 );
+	
+	bSizer20->Add( bSizer26, 0, wxALIGN_RIGHT, 5 );
+@@ -1605,18 +1570,13 @@ CViewProductDialogBase::CViewProductDialogBase( wxWindow* parent, wxWindowID id,
+	
+	m_buttonBack = new wxButton( this, wxID_BUTTONBACK, wxT("< &Back  "), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonBack->Enable( false );
+	m_buttonBack->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer26->Add( m_buttonBack, 0, wxALL, 5 );
+	
+	m_buttonNext = new wxButton( this, wxID_BUTTONNEXT, wxT("  &Next >"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonNext->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer26->Add( m_buttonNext, 0, wxALL, 5 );
+	
+	m_buttonCancel = new wxButton( this, wxID_CANCEL, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonCancel->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer26->Add( m_buttonCancel, 0, wxALL, 5 );
+	
+	bSizer20->Add( bSizer26, 0, wxALIGN_RIGHT, 5 );
+@@ -1662,8 +1622,6 @@ CViewOrderDialogBase::CViewOrderDialogBase( wxWindow* parent, wxWindowID id, con
+	bSizer26 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_buttonOK = new wxButton( this, wxID_OK, wxT("OK"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonOK->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer26->Add( m_buttonOK, 0, wxALL, 5 );
+	
+	bSizer20->Add( bSizer26, 0, wxALIGN_RIGHT, 5 );
+@@ -1720,13 +1678,9 @@ CEditReviewDialogBase::CEditReviewDialogBase( wxWindow* parent, wxWindowID id, c
+	bSizer113 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_buttonSubmit = new wxButton( this, wxID_SUBMIT, wxT("&Submit"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonSubmit->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer113->Add( m_buttonSubmit, 0, wxALL, 5 );
+	
+	m_buttonCancel = new wxButton( this, wxID_CANCEL, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonCancel->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer113->Add( m_buttonCancel, 0, wxALL, 5 );
+	
+	bSizer112->Add( bSizer113, 0, wxALIGN_RIGHT, 5 );
+@@ -1951,13 +1905,9 @@ CGetTextFromUserDialogBase::CGetTextFromUserDialogBase( wxWindow* parent, wxWind
+	bSizer80->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_buttonOK = new wxButton( this, wxID_OK, wxT("OK"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	m_buttonOK->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer80->Add( m_buttonOK, 0, wxALL, 5 );
+	
+	m_buttonCancel = new wxButton( this, wxID_CANCEL, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buttonCancel->SetMinSize( wxSize( 85,25 ) );
+	
+	bSizer80->Add( m_buttonCancel, 0, wxALL, 5 );
+	
+	bSizer79->Add( bSizer80, 0, wxEXPAND, 5 );
+  @@ -70,7 +70,7 @@
+            <event name="OnSetFocus"></event>
+            <event name="OnSize"></event>
+            <event name="OnUpdateUI"></event>
+            <object class="wxMenuBar" expanded="1">
+            <object class="wxMenuBar" expanded="0">
+                <property name="bg">240,240,240</property>
+                <property name="context_help"></property>
+                <property name="enabled">1</property>
+@@ -225,7 +225,7 @@
+                    </object>
+                </object>
+            </object>
+            <object class="wxToolBar" expanded="1">
+            <object class="wxToolBar" expanded="0">
+                <property name="bg"></property>
+                <property name="bitmapsize">20,20</property>
+                <property name="context_help"></property>
+@@ -439,7 +439,7 @@
+                                <property name="name">m_textCtrlAddress</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+                                <property name="size">250,-1</property>
+                                <property name="size">340,-1</property>
+                                <property name="style">wxTE_READONLY</property>
+                                <property name="subclass"></property>
+                                <property name="tooltip"></property>
+@@ -944,7 +944,7 @@
+                                            <property name="tooltip"></property>
+                                            <property name="window_extra_style"></property>
+                                            <property name="window_name"></property>
+                                            <property name="window_style">wxALWAYS_SHOW_SB</property>
+                                            <property name="window_style">wxVSCROLL</property>
+                                            <event name="OnChar"></event>
+                                            <event name="OnEnterWindow"></event>
+                                            <event name="OnEraseBackground"></event>
+@@ -1648,7 +1648,7 @@
+                                <property name="name">m_buttonOK</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+                                <property name="size">85,25</property>
+                                <property name="size">-1,-1</property>
+                                <property name="style"></property>
+                                <property name="subclass"></property>
+                                <property name="tooltip"></property>
+@@ -3031,7 +3031,7 @@
+                                <property name="name">m_buttonOK</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+                                <property name="size">85,25</property>
+                                <property name="size">-1,-1</property>
+                                <property name="style"></property>
+                                <property name="subclass"></property>
+                                <property name="tooltip"></property>
+@@ -3079,7 +3079,7 @@
+                                <property name="id">wxID_CANCEL</property>
+                                <property name="label">Cancel</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonCancel</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -3131,7 +3131,7 @@
+                                <property name="id">wxID_APPLY</property>
+                                <property name="label">&amp;Apply</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonApply</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -3493,7 +3493,7 @@
+                                <property name="name">m_buttonOK</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+                                <property name="size">85,25</property>
+                                <property name="size">-1,-1</property>
+                                <property name="style"></property>
+                                <property name="subclass"></property>
+                                <property name="tooltip"></property>
+@@ -4485,7 +4485,7 @@
+                                <property name="id">wxID_BUTTONSEND</property>
+                                <property name="label">&amp;Send</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonSend</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -4537,7 +4537,7 @@
+                                <property name="id">wxID_CANCEL</property>
+                                <property name="label">Cancel</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonCancel</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -4775,7 +4775,7 @@
+                                <property name="id">wxID_ANY</property>
+                                <property name="label">OK</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonOK</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -4827,7 +4827,7 @@
+                                <property name="id">wxID_CANCEL</property>
+                                <property name="label">Cancel</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonCancel</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -5089,7 +5089,7 @@
+                                <property name="id">wxID_BUTTONRENAME</property>
+                                <property name="label">&amp;Edit...</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonRename</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -5141,7 +5141,7 @@
+                                <property name="id">wxID_BUTTONNEW</property>
+                                <property name="label">&amp;New Address...</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">110,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonNew</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -5193,7 +5193,7 @@
+                                <property name="id">wxID_BUTTONCOPY</property>
+                                <property name="label">&amp;Copy to Clipboard</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">120,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonCopy</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -5245,7 +5245,7 @@
+                                <property name="id">wxID_OK</property>
+                                <property name="label">OK</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonOK</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -5297,7 +5297,7 @@
+                                <property name="id">wxID_CANCEL</property>
+                                <property name="label">Cancel</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonCancel</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -5559,7 +5559,7 @@
+                                <property name="id">wxID_BUTTONEDIT</property>
+                                <property name="label">&amp;Edit...</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonEdit</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -5611,7 +5611,7 @@
+                                <property name="id">wxID_BUTTONNEW</property>
+                                <property name="label">&amp;New Address...</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">110,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonNew</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -5663,7 +5663,7 @@
+                                <property name="id">wxID_BUTTONDELETE</property>
+                                <property name="label">&amp;Delete</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonDelete</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -5715,7 +5715,7 @@
+                                <property name="id">wxID_OK</property>
+                                <property name="label">OK</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonOK</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -5767,7 +5767,7 @@
+                                <property name="id">wxID_CANCEL</property>
+                                <property name="label">Cancel</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonCancel</property>
+                                <property name="permission">public</property>
+                                <property name="pos"></property>
+@@ -10225,7 +10225,7 @@
+                                <property name="id">wxID_BUTTONSEND</property>
+                                <property name="label">&amp;Send</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonOK</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -10277,7 +10277,7 @@
+                                <property name="id">wxID_BUTTONPREVIEW</property>
+                                <property name="label">&amp;Preview</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonPreview</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -10329,7 +10329,7 @@
+                                <property name="id">wxID_CANCEL</property>
+                                <property name="label">Cancel</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonCancel</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -10798,7 +10798,7 @@
+                                <property name="id">wxID_BUTTONBACK</property>
+                                <property name="label">&lt; &amp;Back  </property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonBack</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -10850,7 +10850,7 @@
+                                <property name="id">wxID_BUTTONNEXT</property>
+                                <property name="label">  &amp;Next &gt;</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonNext</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -10902,7 +10902,7 @@
+                                <property name="id">wxID_CANCEL</property>
+                                <property name="label">Cancel</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonCancel</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -11087,7 +11087,7 @@
+                                <property name="id">wxID_OK</property>
+                                <property name="label">OK</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonOK</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -11488,7 +11488,7 @@
+                                <property name="id">wxID_SUBMIT</property>
+                                <property name="label">&amp;Submit</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonSubmit</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -11540,7 +11540,7 @@
+                                <property name="id">wxID_CANCEL</property>
+                                <property name="label">Cancel</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonCancel</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -12907,7 +12907,7 @@
+                                <property name="id">wxID_OK</property>
+                                <property name="label">OK</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonOK</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+@@ -12959,7 +12959,7 @@
+                                <property name="id">wxID_CANCEL</property>
+                                <property name="label">Cancel</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size">85,25</property>
+                                <property name="minimum_size">-1,-1</property>
+                                <property name="name">m_buttonCancel</property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+            @@ -96,12 +96,7 @@ void RandAddSeedPerfmon()
+        hash = 0;
+        memset(pdata, 0, nSize);
+
+        time_t nTime;
+        time(&nTime);
+        struct tm* ptmTime = gmtime(&nTime);
+        char pszTime[200];
+        strftime(pszTime, sizeof(pszTime), "%x %H:%M:%S", ptmTime);
+        printf("%s RandAddSeed() %d bytes\n", pszTime, nSize);
+        printf("%s RandAddSeed() %d bytes\n", DateTimeStrFormat("%x %H:%M:%S", GetTime()).c_str(), nSize);
+    }
+#endif
+}
+@@ -350,7 +345,9 @@ void FormatException(char* pszMessage, std::exception* pex, const char* pszThrea
+    pszModule[0] = '\0';
+    GetModuleFileName(NULL, pszModule, sizeof(pszModule));
+#else
+    const char* pszModule = wxStandardPaths::Get().GetExecutablePath().mb_str();
+    // might not be thread safe, uses wxString
+    //const char* pszModule = wxStandardPaths::Get().GetExecutablePath().mb_str();
+    const char* pszModule = "bitcoin";
+#endif
+    if (pex)
+        snprintf(pszMessage, 1000,
+@@ -425,7 +422,6 @@ void GetDataDir(char* pszDir)
+        }
+        strlcpy(pszDir, pszCachedDir, MAX_PATH);
+    }
+
+}
+
+string GetDataDir()
+@@ -84,6 +84,10 @@ inline void SetThreadPriority(int nThread, int nPriority) { setpriority(PRIO_PRO
+#define THREAD_PRIORITY_NORMAL          0
+#define THREAD_PRIORITY_ABOVE_NORMAL    0
+#endif
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL        0
+#endif
+
+
+
+
+@@ -379,6 +383,14 @@ inline int64 GetTimeMillis()
+    return wxGetLocalTimeMillis().GetValue();
+}
+
+inline string DateTimeStrFormat(const char* pszFormat, int64 nTime)
+{
+    time_t n = nTime;
+    struct tm* ptmTime = gmtime(&n);
+    char pszTime[200];
+    strftime(pszTime, sizeof(pszTime), pszFormat, ptmTime);
+    return pszTime;
+}
+
+
+
+@@ -400,7 +412,7 @@ inline void heapchk()
+    {                                                               \
+        static char nLoops;                                         \
+        if (nLoops <= 0)                                            \
+            nLoops = GetRand(50) + 1;                               \
+            nLoops = GetRand(20) + 1;                               \
+        if (nLoops-- > 1)                                           \
+        {                                                           \
+            ThreadFn;                                               \
