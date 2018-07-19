@@ -1,0 +1,188 @@
+@@ -72,6 +72,8 @@
+#include <netdb.h>
+#include <unistd.h>
+#include <errno.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <boost/filesystem.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/algorithm/string.hpp>
+@@ -1215,7 +1215,7 @@ bool CBlock::AcceptBlock()
+        return error("AcceptBlock() : block's timestamp is too early");
+
+    // Check that all transactions are finalized (starting around Dec 2009)
+    if (nBestHeight > 31000) // 25620 + 5320
+    if (nBestHeight > 31000)
+        foreach(const CTransaction& tx, vtx)
+            if (!tx.IsFinal(nTime))
+                return error("AcceptBlock() : contains a non-final transaction");
+@@ -1802,7 +1802,7 @@ bool ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
+        {
+            if (fShutdown)
+                return true;
+            addr.nTime = GetAdjustedTime();
+            addr.nTime = GetAdjustedTime() - 2 * 60 * 60;
+            if (pfrom->fGetAddr)
+                addr.nTime -= 5 * 24 * 60 * 60;
+            AddAddress(addrdb, addr, false);
+       @@ -15,21 +15,24 @@ endif
+
+
+
+INCLUDEPATHS=-I"/usr/include" \
+             -I"/usr/local/boost_1_40_0" \
+             -I"/usr/local/db-4.7.25.NC/build_unix" \
+             -I"/usr/local/include/wx-2.8" \
+             -I"/usr/local/lib/wx/include/gtk2-ansi-debug-static-2.8"
+
+LIBPATHS=-L"/usr/lib" \
+         -L"/usr/local/lib" \
+         -L"/usr/local/db-4.7.25.NC/build_unix"
+INCLUDEPATHS= \
+ -I"/usr/include" \
+ -I"/usr/local/boost_1_40_0" \
+ -I"/usr/local/db-4.7.25.NC/build_unix" \
+ -I"/usr/local/include/wx-2.8" \
+ -I"/usr/local/lib/wx/include/gtk2-ansi-debug-static-2.8"
+
+LIBPATHS= \
+ -L"/usr/lib" \
+ -L"/usr/local/lib" \
+ -L"/usr/local/db-4.7.25.NC/build_unix"
+
+LIBS= \
+ -Wl,-Bstatic -l boost_thread -l boost_system -l boost_filesystem -Wl,-Bdynamic \
+ -Wl,-Bstatic -l db_cxx -l wx_gtk2$(D)-2.8 -Wl,-Bdynamic \
+ -l crypto \
+ -l gtk-x11-2.0 -l gthread-2.0 -l SM
+
+WXDEFS=-D__WXGTK__ -DNOPCH
+CFLAGS=-O0 -w -Wno-invalid-offsetof -Wformat $(DEBUGFLAGS) $(WXDEFS) $(INCLUDEPATHS)
+HEADERS=headers.h util.h main.h serialize.h uint256.h key.h bignum.h script.h db.h base58.h
+@@ -76,7 +79,7 @@ obj/irc.o:  irc.cpp		    $(HEADERS)
+
+
+OBJS=obj/util.o obj/script.o obj/db.o obj/net.o obj/main.o obj/market.o \
+	obj/ui.o obj/uibase.o obj/sha.o obj/irc.o 
+	obj/ui.o obj/uibase.o obj/sha.o obj/irc.o
+
+bitcoin: headers.h.gch $(OBJS)
+	g++ $(CFLAGS) -o $@ $(LIBPATHS) $(OBJS) $(LIBS)
+  @@ -842,20 +842,20 @@ void ThreadOpenConnections2(void* parg)
+                if (!addr.IsIPv4() || !addr.IsValid() || setConnected.count(addr.ip))
+                    continue;
+
+                // Randomize the order in a deterministic way, putting the standard port first
+                int64 nRandomizer = (uint64)(addr.nLastFailed * 9567851 + addr.ip * 7789) % (1 * 60 * 60);
+                if (addr.port != DEFAULT_PORT)
+                    nRandomizer += 1 * 60 * 60;
+
+                // Limit retry frequency
+                if (GetAdjustedTime() < addr.nLastFailed + nDelay)
+                if (GetAdjustedTime() < addr.nLastFailed + nDelay + nRandomizer)
+                    continue;
+
+                // Try again only after all addresses had a first attempt
+                int64 nTime = addr.nTime;
+                int64 nTime = addr.nTime - nRandomizer;
+                if (addr.nLastFailed > addr.nTime)
+                    nTime -= 365 * 24 * 60 * 60;
+
+                // Randomize the order a little, putting the standard port first
+                nTime += GetRand(1 * 60 * 60);
+                if (addr.port != DEFAULT_PORT)
+                    nTime -= 1 * 60 * 60;
+
+                if (nTime > nBestTime)
+                {
+                    nBestTime = nTime;
+@@ -1069,6 +1069,7 @@ bool StartNode(string& strError)
+    if (pnodeLocalHost == NULL)
+        pnodeLocalHost = new CNode(INVALID_SOCKET, CAddress("127.0.0.1", nLocalServices));
+
+#ifdef __WXMSW__
+    // Get local host ip
+    char pszHostName[255];
+    if (gethostname(pszHostName, sizeof(pszHostName)) == SOCKET_ERROR)
+@@ -1090,10 +1091,49 @@ bool StartNode(string& strError)
+        printf("host ip %d: %s\n", i, CAddress(*(unsigned int*)phostent->h_addr_list[i]).ToStringIP().c_str());
+    for (int i = 0; phostent->h_addr_list[i] != NULL; i++)
+    {
+        addrLocalHost = CAddress(*(unsigned int*)phostent->h_addr_list[i], DEFAULT_PORT, nLocalServices);
+        if (addrLocalHost.IsValid() && addrLocalHost.GetByte(3) != 127)
+        CAddress addr(*(unsigned int*)phostent->h_addr_list[i], DEFAULT_PORT, nLocalServices);
+        if (addr.IsValid() && addr.GetByte(3) != 127)
+        {
+            addrLocalHost = addr;
+            break;
+        }
+    }
+#else
+    // Get local host ip
+    struct ifaddrs* myaddrs;
+    if (getifaddrs(&myaddrs) == 0)
+    {
+        for (struct ifaddrs* ifa = myaddrs; ifa != NULL; ifa = ifa->ifa_next)
+        {
+            if (ifa->ifa_addr == NULL) continue;
+            if ((ifa->ifa_flags & IFF_UP) == 0) continue;
+            if (strcmp(ifa->ifa_name, "lo") == 0) continue;
+            if (strcmp(ifa->ifa_name, "lo0") == 0) continue;
+            char pszIP[100];
+            if (ifa->ifa_addr->sa_family == AF_INET)
+            {
+                struct sockaddr_in* s4 = (struct sockaddr_in*)(ifa->ifa_addr);
+                if (inet_ntop(ifa->ifa_addr->sa_family, (void*)&(s4->sin_addr), pszIP, sizeof(pszIP)) != NULL)
+                    printf("ipv4 %s: %s\n", ifa->ifa_name, pszIP);
+
+                // Take the first IP that isn't loopback 127.x.x.x
+                CAddress addr(*(unsigned int*)&s4->sin_addr, DEFAULT_PORT, nLocalServices);
+                if (addr.IsValid() && addr.GetByte(3) != 127)
+                {
+                    addrLocalHost = addr;
+                    break;
+                }
+            }
+            else if (ifa->ifa_addr->sa_family == AF_INET6)
+            {
+                struct sockaddr_in6* s6 = (struct sockaddr_in6*)(ifa->ifa_addr);
+                if (inet_ntop(ifa->ifa_addr->sa_family, (void*)&(s6->sin6_addr), pszIP, sizeof(pszIP)) != NULL)
+                    printf("ipv6 %s: %s\n", ifa->ifa_name, pszIP);
+            }
+        }
+        freeifaddrs(myaddrs);
+    }
+#endif
+    printf("addrLocalHost = %s\n", addrLocalHost.ToString().c_str());
+
+    // Get our external IP address for incoming connections
+ @@ -387,17 +387,28 @@ CMainFrame::~CMainFrame()
+void Shutdown(void* parg)
+{
+    static CCriticalSection cs_Shutdown;
+    static bool fTaken;
+    bool fFirstThread;
+    CRITICAL_BLOCK(cs_Shutdown)
+    {
+        fFirstThread = !fTaken;
+        fTaken = true;
+    }
+    if (fFirstThread)
+    {
+        fShutdown = true;
+        nTransactionsUpdated++;
+        DBFlush(false);
+        StopNode();
+        DBFlush(true);
+
+        printf("Bitcoin exiting\n\n");
+        exit(0);
+    }
+    else
+    {
+        loop
+            Sleep(100000);
+    }
+}
+
+void CMainFrame::OnClose(wxCloseEvent& event)   
