@@ -1,0 +1,227 @@
+@@ -139,7 +139,7 @@ void DBFlush(bool fShutdown)
+{
+    // Flush log data to the actual data file
+    //  on all files that are not in use
+    printf("DBFlush(%s)\n", fShutdown ? "true" : "false");
+    printf("DBFlush(%s)%s\n", fShutdown ? "true" : "false", fDbEnvInit ? "" : " db not started");
+    if (!fDbEnvInit)
+        return;
+    CRITICAL_BLOCK(cs_db)
+    @@ -42,8 +42,6 @@ map<uint160, vector<unsigned char> > mapPubKeys;
+CCriticalSection cs_mapKeys;
+CKey keyUser;
+
+int nDropMessagesTest = 0;
+
+// Settings
+int fGenerateBitcoins = false;
+int64 nTransactionFee = 0;
+@@ -1721,9 +1719,9 @@ bool ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
+    static map<unsigned int, vector<unsigned char> > mapReuseKey;
+    RandAddSeedPerfmon();
+    printf("received: %s (%d bytes)\n", strCommand.c_str(), vRecv.size());
+    if (nDropMessagesTest > 0 && GetRand(nDropMessagesTest) == 0)
+    if (mapArgs.count("-dropmessagestest") && GetRand(atoi(mapArgs["-dropmessagestest"])) == 0)
+    {
+        printf("dropmessages DROPPING RECV MESSAGE\n");
+        printf("dropmessagestest DROPPING RECV MESSAGE\n");
+        return true;
+    }
+
+@@ -2315,6 +2313,8 @@ void BitcoinMiner()
+            Sleep(1000);
+            if (fShutdown)
+                return;
+            if (!fGenerateBitcoins)
+                return;
+        }
+
+        unsigned int nTransactionsUpdatedLast = nTransactionsUpdated;
+        @@ -34,7 +34,6 @@ extern int nBestHeight;
+extern uint256 hashBestChain;
+extern CBlockIndex* pindexBest;
+extern unsigned int nTransactionsUpdated;
+extern int nDropMessagesTest;
+
+// Settings
+extern int fGenerateBitcoins;
+@@ -511,11 +511,6 @@ void ThreadSocketHandler(void* parg)
+        PrintException(NULL, "ThreadSocketHandler()");
+    }
+
+    foreach(CNode* pnode, vNodes)
+        closesocket(pnode->hSocket);
+    if (closesocket(hListenSocket) == SOCKET_ERROR)
+        printf("closesocket(hListenSocket) failed with error %d\n", WSAGetLastError());
+
+    printf("ThreadSocketHandler exiting\n");
+}
+
+@@ -989,15 +984,13 @@ void ThreadMessageHandler2(void* parg)
+
+
+
+
+bool StartNode(string& strError)
+bool BindListenPort(string& strError)
+{
+    if (pnodeLocalHost == NULL)
+        pnodeLocalHost = new CNode(INVALID_SOCKET, CAddress("127.0.0.1", nLocalServices));
+    strError = "";
+    int nOne = 1;
+
+#ifdef __WXMSW__
+    // Sockets startup
+    // Initialize Windows Sockets
+    WSADATA wsadata;
+    int ret = WSAStartup(MAKEWORD(2,2), &wsadata);
+    if (ret != NO_ERROR)
+@@ -1008,33 +1001,6 @@ bool StartNode(string& strError)
+    }
+#endif
+
+    // Get local host ip
+    char pszHostName[255];
+    if (gethostname(pszHostName, sizeof(pszHostName)) == SOCKET_ERROR)
+    {
+        strError = strprintf("Error: Unable to get IP address of this computer (gethostname returned error %d)", WSAGetLastError());
+        printf("%s\n", strError.c_str());
+        return false;
+    }
+    struct hostent* phostent = gethostbyname(pszHostName);
+    if (!phostent)
+    {
+        strError = strprintf("Error: Unable to get IP address of this computer (gethostbyname returned error %d)", WSAGetLastError());
+        printf("%s\n", strError.c_str());
+        return false;
+    }
+
+    // Take the first IP that isn't loopback 127.x.x.x
+    for (int i = 0; phostent->h_addr_list[i] != NULL; i++)
+        printf("host ip %d: %s\n", i, CAddress(*(unsigned int*)phostent->h_addr_list[i]).ToStringIP().c_str());
+    for (int i = 0; phostent->h_addr_list[i] != NULL; i++)
+    {
+        addrLocalHost = CAddress(*(unsigned int*)phostent->h_addr_list[i], DEFAULT_PORT, nLocalServices);
+        if (addrLocalHost.IsValid() && addrLocalHost.GetByte(3) != 127)
+            break;
+    }
+    printf("addrLocalHost = %s\n", addrLocalHost.ToString().c_str());
+
+    // Create socket for listening for incoming connections
+    hListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (hListenSocket == INVALID_SOCKET)
+@@ -1043,15 +1009,21 @@ bool StartNode(string& strError)
+        printf("%s\n", strError.c_str());
+        return false;
+    }
+
+#if defined(__BSD__) || defined(__WXOSX__)
+    int set = 1;
+    setsockopt(hSocket, SOL_SOCKET, SO_NOSIGPIPE, (void*)&set, sizeof(int));
+    // Different way of disabling SIGPIPE on BSD
+    setsockopt(hListenSocket, SOL_SOCKET, SO_NOSIGPIPE, (void*)&nOne, sizeof(int));
+#endif
+
+#ifndef __WXMSW__
+    // Allow binding if the port is still in TIME_WAIT state after
+    // the program was closed and restarted.  Not an issue on windows.
+    setsockopt(hListenSocket, SOL_SOCKET, SO_REUSEADDR, (void*)&nOne, sizeof(int));
+#endif
+
+    // Set to nonblocking, incoming connections will also inherit this
+#ifdef __WXMSW__
+    u_long nOne = 1;
+    if (ioctlsocket(hListenSocket, FIONBIO, &nOne) == SOCKET_ERROR)
+    // Set to nonblocking, incoming connections will also inherit this
+    if (ioctlsocket(hListenSocket, FIONBIO, (u_long*)&nOne) == SOCKET_ERROR)
+#else
+    if (fcntl(hListenSocket, F_SETFL, O_NONBLOCK) == SOCKET_ERROR)
+#endif
+@@ -1072,7 +1044,7 @@ bool StartNode(string& strError)
+    {
+        int nErr = WSAGetLastError();
+        if (nErr == WSAEADDRINUSE)
+            strError = strprintf("Error: Unable to bind to port %d on this computer. The program is probably already running.", ntohs(sockaddr.sin_port));
+            strError = strprintf("Unable to bind to port %d on this computer.  Bitcoin may be running already.", ntohs(sockaddr.sin_port));
+        else
+            strError = strprintf("Error: Unable to bind to port %d on this computer (bind returned error %d)", ntohs(sockaddr.sin_port), nErr);
+        printf("%s\n", strError.c_str());
+@@ -1088,6 +1060,42 @@ bool StartNode(string& strError)
+        return false;
+    }
+
+    return true;
+}
+
+bool StartNode(string& strError)
+{
+    strError = "";
+    if (pnodeLocalHost == NULL)
+        pnodeLocalHost = new CNode(INVALID_SOCKET, CAddress("127.0.0.1", nLocalServices));
+
+    // Get local host ip
+    char pszHostName[255];
+    if (gethostname(pszHostName, sizeof(pszHostName)) == SOCKET_ERROR)
+    {
+        strError = strprintf("Error: Unable to get IP address of this computer (gethostname returned error %d)", WSAGetLastError());
+        printf("%s\n", strError.c_str());
+        return false;
+    }
+    struct hostent* phostent = gethostbyname(pszHostName);
+    if (!phostent)
+    {
+        strError = strprintf("Error: Unable to get IP address of this computer (gethostbyname returned error %d)", WSAGetLastError());
+        printf("%s\n", strError.c_str());
+        return false;
+    }
+
+    // Take the first IP that isn't loopback 127.x.x.x
+    for (int i = 0; phostent->h_addr_list[i] != NULL; i++)
+        printf("host ip %d: %s\n", i, CAddress(*(unsigned int*)phostent->h_addr_list[i]).ToStringIP().c_str());
+    for (int i = 0; phostent->h_addr_list[i] != NULL; i++)
+    {
+        addrLocalHost = CAddress(*(unsigned int*)phostent->h_addr_list[i], DEFAULT_PORT, nLocalServices);
+        if (addrLocalHost.IsValid() && addrLocalHost.GetByte(3) != 127)
+            break;
+    }
+    printf("addrLocalHost = %s\n", addrLocalHost.ToString().c_str());
+
+    // Get our external IP address for incoming connections
+    if (fUseProxy)
+    {
+@@ -1158,9 +1166,5 @@ bool StopNode()
+        Sleep(20);
+    Sleep(50);
+
+    // Sockets shutdown
+#ifdef __WXMSW__
+    WSACleanup();
+#endif
+    return true;
+}@@ -28,6 +28,7 @@ CNode* FindNode(unsigned int ip);
+CNode* ConnectNode(CAddress addrConnect, int64 nTimeout=0);
+void AbandonRequests(void (*fn)(void*, CDataStream&), void* param1);
+bool AnySubscribed(unsigned int nChannel);
+bool BindListenPort(string& strError=REF(string()));
+bool StartNode(string& strError=REF(string()));
+bool StopNode();
+
+@@ -456,6 +457,8 @@ extern CNode* pnodeLocalHost;
+extern uint64 nLocalHostNonce;
+extern bool fShutdown;
+extern array<int, 10> vnThreadsRunning;
+extern SOCKET hListenSocket;
+
+extern vector<CNode*> vNodes;
+extern CCriticalSection cs_vNodes;
+extern map<vector<unsigned char>, CAddress> mapAddresses;
+@@ -647,8 +650,7 @@ public:
+
+    void EndMessage()
+    {
+        extern int nDropMessagesTest;
+        if (nDropMessagesTest > 0 && GetRand(nDropMessagesTest) == 0)
+        if (mapArgs.count("-dropmessagestest") && GetRand(atoi(mapArgs["-dropmessagestest"])) == 0)
+        {
+            printf("dropmessages DROPPING SEND MESSAGE\n");
+            AbortMessage();
