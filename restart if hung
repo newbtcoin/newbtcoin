@@ -1,0 +1,328 @@
+@@ -29,7 +29,7 @@ CNode* ConnectNode(CAddress addrConnect, int64 nTimeout=0);
+void AbandonRequests(void (*fn)(void*, CDataStream&), void* param1);
+bool AnySubscribed(unsigned int nChannel);
+bool BindListenPort(string& strError=REF(string()));
+bool StartNode(string& strError=REF(string()));
+void StartNode(void* parg);
+bool StopNode();
+
+
+@@ -39,7 +39,6 @@ bool StopNode();
+
+
+
+
+//
+// Message header
+//  (4) message start
+@@ -139,7 +138,7 @@ public:
+    unsigned int nTime;
+
+    // memory only
+    unsigned int nLastFailed;
+    unsigned int nLastTry;
+
+    CAddress()
+    {
+@@ -183,7 +182,7 @@ public:
+        ip = INADDR_NONE;
+        port = DEFAULT_PORT;
+        nTime = GetAdjustedTime();
+        nLastFailed = 0;
+        nLastTry = 0;
+    }
+
+    bool SetAddress(const char* pszIn)
+@@ -458,6 +457,7 @@ extern uint64 nLocalHostNonce;
+extern bool fShutdown;
+extern array<int, 10> vnThreadsRunning;
+extern SOCKET hListenSocket;
+extern int64 nThreadSocketHandlerHeartbeat;
+
+extern vector<CNode*> vNodes;
+extern CCriticalSection cs_vNodes;
+@@ -486,6 +486,10 @@ public:
+    CDataStream vRecv;
+    CCriticalSection cs_vSend;
+    CCriticalSection cs_vRecv;
+    int64 nLastSend;
+    int64 nLastRecv;
+    int64 nLastSendEmpty;
+    int64 nTimeConnected;
+    unsigned int nPushPos;
+    CAddress addr;
+    int nVersion;
+@@ -523,6 +527,10 @@ public:
+        hSocket = hSocketIn;
+        vSend.SetType(SER_NETWORK);
+        vRecv.SetType(SER_NETWORK);
+        nLastSend = 0;
+        nLastRecv = 0;
+        nLastSendEmpty = GetTime();
+        nTimeConnected = GetTime();
+        nPushPos = -1;
+        addr = addrIn;
+        nVersion = 0;
+@@ -542,7 +550,7 @@ public:
+        CAddress addrYou = (fUseProxy ? CAddress("0.0.0.0") : addr);
+        CAddress addrMe = (fUseProxy ? CAddress("0.0.0.0") : addrLocalHost);
+        RAND_bytes((unsigned char*)&nLocalHostNonce, sizeof(nLocalHostNonce));
+        PushMessage("version", VERSION, nLocalServices, nTime, addrYou, addrMe, nLocalHostNonce);
+        PushMessage("version", VERSION, nLocalServices, nTime, addrYou, addrMe, nLocalHostNonce, "linux-test5");
+    }
+
+    ~CNode()
+@@ -557,11 +565,6 @@ private:
+public:
+
+
+    bool ReadyToDisconnect()
+    {
+        return fDisconnect || GetRefCount() <= 0;
+    }
+
+    int GetRefCount()
+    {
+        return max(nRefCount, 0) + (GetTime() < nReleaseTime ? 1 : 0);
+@@ -635,6 +638,8 @@ public:
+            AbortMessage();
+        nPushPos = vSend.size();
+        vSend << CMessageHeader(pszCommand, 0);
+        if (fDebug)
+            printf("%s ", DateTimeStrFormat("%x %H:%M:%S", GetTime()).c_str());
+        printf("sending: %s ", pszCommand);
+    }
+@@ -29,7 +29,7 @@ CNode* ConnectNode(CAddress addrConnect, int64 nTimeout=0);
+void AbandonRequests(void (*fn)(void*, CDataStream&), void* param1);
+bool AnySubscribed(unsigned int nChannel);
+bool BindListenPort(string& strError=REF(string()));
+bool StartNode(string& strError=REF(string()));
+void StartNode(void* parg);
+bool StopNode();
+
+
+@@ -39,7 +39,6 @@ bool StopNode();
+
+
+
+
+//
+// Message header
+//  (4) message start
+@@ -139,7 +138,7 @@ public:
+    unsigned int nTime;
+
+    // memory only
+    unsigned int nLastFailed;
+    unsigned int nLastTry;
+
+    CAddress()
+    {
+@@ -183,7 +182,7 @@ public:
+        ip = INADDR_NONE;
+        port = DEFAULT_PORT;
+        nTime = GetAdjustedTime();
+        nLastFailed = 0;
+        nLastTry = 0;
+    }
+
+    bool SetAddress(const char* pszIn)
+@@ -458,6 +457,7 @@ extern uint64 nLocalHostNonce;
+extern bool fShutdown;
+extern array<int, 10> vnThreadsRunning;
+extern SOCKET hListenSocket;
+extern int64 nThreadSocketHandlerHeartbeat;
+
+extern vector<CNode*> vNodes;
+extern CCriticalSection cs_vNodes;
+@@ -486,6 +486,10 @@ public:
+    CDataStream vRecv;
+    CCriticalSection cs_vSend;
+    CCriticalSection cs_vRecv;
+    int64 nLastSend;
+    int64 nLastRecv;
+    int64 nLastSendEmpty;
+    int64 nTimeConnected;
+    unsigned int nPushPos;
+    CAddress addr;
+    int nVersion;
+@@ -523,6 +527,10 @@ public:
+        hSocket = hSocketIn;
+        vSend.SetType(SER_NETWORK);
+        vRecv.SetType(SER_NETWORK);
+        nLastSend = 0;
+        nLastRecv = 0;
+        nLastSendEmpty = GetTime();
+        nTimeConnected = GetTime();
+        nPushPos = -1;
+        addr = addrIn;
+        nVersion = 0;
+@@ -542,7 +550,7 @@ public:
+        CAddress addrYou = (fUseProxy ? CAddress("0.0.0.0") : addr);
+        CAddress addrMe = (fUseProxy ? CAddress("0.0.0.0") : addrLocalHost);
+        RAND_bytes((unsigned char*)&nLocalHostNonce, sizeof(nLocalHostNonce));
+        PushMessage("version", VERSION, nLocalServices, nTime, addrYou, addrMe, nLocalHostNonce);
+        PushMessage("version", VERSION, nLocalServices, nTime, addrYou, addrMe, nLocalHostNonce, "linux-test5");
+    }
+
+    ~CNode()
+@@ -557,11 +565,6 @@ private:
+public:
+
+
+    bool ReadyToDisconnect()
+    {
+        return fDisconnect || GetRefCount() <= 0;
+    }
+
+    int GetRefCount()
+    {
+        return max(nRefCount, 0) + (GetTime() < nReleaseTime ? 1 : 0);
+@@ -635,6 +638,8 @@ public:
+            AbortMessage();
+        nPushPos = vSend.size();
+        vSend << CMessageHeader(pszCommand, 0);
+        if (fDebug)
+            printf("%s ", DateTimeStrFormat("%x %H:%M:%S", GetTime()).c_str());
+        printf("sending: %s ", pszCommand);
+    }
+@@ -45,7 +45,7 @@ CMainFrameBase::CMainFrameBase( wxWindow* parent, wxWindowID id, const wxString&
+	m_menuOptions->Append( m_menuOptionsChangeYourAddress );
+	
+	wxMenuItem* m_menuOptionsOptions;
+	m_menuOptionsOptions = new wxMenuItem( m_menuOptions, wxID_ANY, wxString( wxT("&Options...") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuOptionsOptions = new wxMenuItem( m_menuOptions, wxID_MENUOPTIONSOPTIONS, wxString( wxT("&Options...") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuOptions->Append( m_menuOptionsOptions );
+	
+	m_menubar->Append( m_menuOptions, wxT("&Options") );
+@@ -428,21 +428,13 @@ COptionsDialogBase::COptionsDialogBase( wxWindow* parent, wxWindowID id, const w
+	
+	bSizer69->Add( m_checkBoxStartOnSystemStartup, 0, wxALL, 5 );
+	
+	m_checkBoxMinimizeToTray = new wxCheckBox( m_panelMain, wxID_ANY, wxT("&Minimize to the system tray instead of the taskbar"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_checkBoxMinimizeToTray = new wxCheckBox( m_panelMain, wxID_ANY, wxT("&Minimize to the tray instead of the taskbar"), wxDefaultPosition, wxDefaultSize, 0 );
+	
+	bSizer69->Add( m_checkBoxMinimizeToTray, 0, wxALL, 5 );
+	
+	wxBoxSizer* bSizer101;
+	bSizer101 = new wxBoxSizer( wxHORIZONTAL );
+	m_checkBoxMinimizeOnClose = new wxCheckBox( m_panelMain, wxID_ANY, wxT("M&inimize to the tray on close"), wxDefaultPosition, wxDefaultSize, 0 );
+	
+	
+	bSizer101->Add( 16, 0, 0, 0, 5 );
+	
+	m_checkBoxMinimizeOnClose = new wxCheckBox( m_panelMain, wxID_ANY, wxT("Mi&nimize to system tray on close"), wxDefaultPosition, wxDefaultSize, 0 );
+	
+	bSizer101->Add( m_checkBoxMinimizeOnClose, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	bSizer69->Add( bSizer101, 1, wxEXPAND, 5 );
+	bSizer69->Add( m_checkBoxMinimizeOnClose, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	wxBoxSizer* bSizer102;
+	bSizer102 = new wxBoxSizer( wxHORIZONTAL );
+  @@ -43,51 +43,52 @@
+#define wxID_MAINFRAME 1000
+#define wxID_VIEWSHOWGENERATED 1001
+#define wxID_OPTIONSGENERATEBITCOINS 1002
+#define wxID_BUTTONSEND 1003
+#define wxID_BUTTONRECEIVE 1004
+#define wxID_TEXTCTRLADDRESS 1005
+#define wxID_BUTTONCOPY 1006
+#define wxID_BUTTONCHANGE 1007
+#define wxID_TRANSACTIONFEE 1008
+#define wxID_PROXYIP 1009
+#define wxID_PROXYPORT 1010
+#define wxID_TEXTCTRLPAYTO 1011
+#define wxID_BUTTONPASTE 1012
+#define wxID_BUTTONADDRESSBOOK 1013
+#define wxID_TEXTCTRLAMOUNT 1014
+#define wxID_CHOICETRANSFERTYPE 1015
+#define wxID_LISTCTRL 1016
+#define wxID_BUTTONRENAME 1017
+#define wxID_BUTTONNEW 1018
+#define wxID_BUTTONEDIT 1019
+#define wxID_BUTTONDELETE 1020
+#define wxID_DEL0 1021
+#define wxID_DEL1 1022
+#define wxID_DEL2 1023
+#define wxID_DEL3 1024
+#define wxID_DEL4 1025
+#define wxID_DEL5 1026
+#define wxID_DEL6 1027
+#define wxID_DEL7 1028
+#define wxID_DEL8 1029
+#define wxID_DEL9 1030
+#define wxID_DEL10 1031
+#define wxID_DEL11 1032
+#define wxID_DEL12 1033
+#define wxID_DEL13 1034
+#define wxID_DEL14 1035
+#define wxID_DEL15 1036
+#define wxID_DEL16 1037
+#define wxID_DEL17 1038
+#define wxID_DEL18 1039
+#define wxID_DEL19 1040
+#define wxID_BUTTONPREVIEW 1041
+#define wxID_BUTTONSAMPLE 1042
+#define wxID_CANCEL2 1043
+#define wxID_BUTTONBACK 1044
+#define wxID_BUTTONNEXT 1045
+#define wxID_SUBMIT 1046
+#define wxID_TEXTCTRL 1047
+#define wxID_MENUOPTIONSOPTIONS 1003
+#define wxID_BUTTONSEND 1004
+#define wxID_BUTTONRECEIVE 1005
+#define wxID_TEXTCTRLADDRESS 1006
+#define wxID_BUTTONCOPY 1007
+#define wxID_BUTTONCHANGE 1008
+#define wxID_TRANSACTIONFEE 1009
+#define wxID_PROXYIP 1010
+#define wxID_PROXYPORT 1011
+#define wxID_TEXTCTRLPAYTO 1012
+#define wxID_BUTTONPASTE 1013
+#define wxID_BUTTONADDRESSBOOK 1014
+#define wxID_TEXTCTRLAMOUNT 1015
+#define wxID_CHOICETRANSFERTYPE 1016
+#define wxID_LISTCTRL 1017
+#define wxID_BUTTONRENAME 1018
+#define wxID_BUTTONNEW 1019
+#define wxID_BUTTONEDIT 1020
+#define wxID_BUTTONDELETE 1021
+#define wxID_DEL0 1022
+#define wxID_DEL1 1023
+#define wxID_DEL2 1024
+#define wxID_DEL3 1025
+#define wxID_DEL4 1026
+#define wxID_DEL5 1027
+#define wxID_DEL6 1028
+#define wxID_DEL7 1029
+#define wxID_DEL8 1030
+#define wxID_DEL9 1031
+#define wxID_DEL10 1032
+#define wxID_DEL11 1033
+#define wxID_DEL12 1034
+#define wxID_DEL13 1035
+#define wxID_DEL14 1036
+#define wxID_DEL15 1037
+#define wxID_DEL16 1038
+#define wxID_DEL17 1039
+#define wxID_DEL18 1040
+#define wxID_DEL19 1041
+#define wxID_BUTTONPREVIEW 1042
+#define wxID_BUTTONSAMPLE 1043
+#define wxID_CANCEL2 1044
+#define wxID_BUTTONBACK 1045
+#define wxID_BUTTONNEXT 1046
+#define wxID_SUBMIT 1047
+#define wxID_TEXTCTRL 1048
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class CMainFrameBase
+@@ -203,7 +204,6 @@ class COptionsDialogBase : public wxDialog
+		wxStaticText* m_staticText35;
+		wxCheckBox* m_checkBoxStartOnSystemStartup;
+		wxCheckBox* m_checkBoxMinimizeToTray;
+		
+		wxCheckBox* m_checkBoxMinimizeOnClose;
+		wxCheckBox* m_checkBoxUseProxy;
+		
