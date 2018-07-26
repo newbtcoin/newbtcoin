@@ -1,0 +1,151 @@
+@@ -1664,7 +1664,7 @@ void COptionsDialog::OnButtonApply(wxCommandEvent& event)
+
+CAboutDialog::CAboutDialog(wxWindow* parent) : CAboutDialogBase(parent)
+{
+    m_staticTextVersion->SetLabel(strprintf("version 0.%d.%d Beta", VERSION/100, VERSION%100));
+    m_staticTextVersion->SetLabel(strprintf("version 0.%d.%d beta", VERSION/100, VERSION%100));
+
+    // Workaround until upgrade to wxWidgets supporting UTF-8
+    wxString str = m_staticTextMain->GetLabel();
+@@ -2030,7 +2030,7 @@ void CSendingDialog::StartTransfer()
+    // We may have connected already for product details
+    if (!Status("Connecting..."))
+        return;
+    CNode* pnode = ConnectNode(addr, 5 * 60);
+    CNode* pnode = ConnectNode(addr, 15 * 60);
+    if (!pnode)
+    {
+        Error("Unable to connect");
+@@ -2075,14 +2075,6 @@ void CSendingDialog::OnReply2(CDataStream& vRecv)
+        return;
+    }
+
+    // Should already be connected
+    CNode* pnode = ConnectNode(addr, 5 * 60);
+    if (!pnode)
+    {
+        Error("Lost connection");
+        return;
+    }
+
+    // Pause to give the user a chance to cancel
+    while (wxDateTime::UNow() < start + wxTimeSpan(0, 0, 0, 2 * 1000))
+    {
+@@ -2112,6 +2104,14 @@ void CSendingDialog::OnReply2(CDataStream& vRecv)
+            return;
+        }
+
+        // Make sure we're still connected
+        CNode* pnode = ConnectNode(addr, 2 * 60 * 60);
+        if (!pnode)
+        {
+            Error("Lost connection, transaction cancelled");
+            return;
+        }
+
+        // Last chance to cancel
+        Sleep(50);
+        if (!Status())
+@@ -3495,12 +3495,14 @@ bool CMyApp::OnInit2()
+
+    if (mapArgs.count("-debug"))
+        fDebug = true;
+    if (strstr(pszSubVer, "test"))
+        fDebug = true;
+
+    if (mapArgs.count("-printtodebugger"))
+        fPrintToDebugger = true;
+
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+    printf("Bitcoin version %d, OS version %s\n", VERSION, wxGetOsDescription().mb_str());
+    printf("Bitcoin version %d%s, OS version %s\n", VERSION, pszSubVer, wxGetOsDescription().mb_str());
+
+    if (mapArgs.count("-loadblockindextest"))
+    {
+@@ -3843,9 +3845,8 @@ void SetStartOnSystemStartup(bool fAutoStart)
+        CoInitialize(NULL);
+
+        // Get a pointer to the IShellLink interface.
+        HRESULT hres = NULL;
+        IShellLink* psl = NULL;
+        hres = CoCreateInstance(CLSID_ShellLink, NULL,
+        HRESULT hres = CoCreateInstance(CLSID_ShellLink, NULL,
+                                CLSCTX_INPROC_SERVER, IID_IShellLink,
+                                reinterpret_cast<void**>(&psl));
+@@ -56,9 +56,11 @@ public:
+
+        // Close sockets
+        foreach(CNode* pnode, vNodes)
+            closesocket(pnode->hSocket);
+        if (closesocket(hListenSocket) == SOCKET_ERROR)
+            printf("closesocket(hListenSocket) failed with error %d\n", WSAGetLastError());
+            if (pnode->hSocket != INVALID_SOCKET)
+                closesocket(pnode->hSocket);
+        if (hListenSocket != INVALID_SOCKET)
+            if (closesocket(hListenSocket) == SOCKET_ERROR)
+                printf("closesocket(hListenSocket) failed with error %d\n", WSAGetLastError());
+
+#ifdef __WXMSW__
+        // Shutdown Windows Sockets
+@@ -348,7 +350,7 @@ void ParseParameters(int argc, char* argv[])
+    {
+        char psz[10000];
+        strlcpy(psz, argv[i], sizeof(psz));
+        char* pszValue = "";
+        char* pszValue = (char*)"";
+        if (strchr(psz, '='))
+        {
+            pszValue = strchr(psz, '=');
+            @@ -57,9 +57,11 @@ inline T& REF(const T& val)
+#ifdef __WXMSW__
+#define MSG_NOSIGNAL        0
+#define MSG_DONTWAIT        0
+#ifndef UINT64_MAX
+#define UINT64_MAX          _UI64_MAX
+#define INT64_MAX           _I64_MAX
+#define INT64_MIN           _I64_MIN
+#endif
+#else
+#define WSAGetLastError()   errno
+#define WSAEWOULDBLOCK      EWOULDBLOCK
+@@ -67,7 +69,7 @@ inline T& REF(const T& val)
+#define WSAEINTR            EINTR
+#define WSAEINPROGRESS      EINPROGRESS
+#define WSAEADDRINUSE       EADDRINUSE
+#define closesocket(s)      close(s)
+#define WSAENOTSOCK         EBADF
+#define INVALID_SOCKET      (SOCKET)(~0)
+#define SOCKET_ERROR        -1
+typedef u_int SOCKET;
+@@ -80,6 +82,23 @@ typedef u_int SOCKET;
+#define Beep(n1,n2)         (0)
+#endif
+
+inline int myclosesocket(SOCKET& hSocket)
+{
+    if (hSocket == INVALID_SOCKET)
+        return WSAENOTSOCK;
+#ifdef __WXMSW__
+    int ret = closesocket(hSocket);
+#else
+    int ret = close(hSocket);
+#endif
+    hSocket = INVALID_SOCKET;
+    return ret;
+}
+#define closesocket(s)      myclosesocket(s)
+
+
+
+
+
+
+
+@@ -149,7 +168,7 @@ public:
+    bool TryEnter() { return mutex.TryLock() == wxMUTEX_NO_ERROR; }
+#endif
+public:
+    char* pszFile;
+    const char* pszFile;
+    int nLine;
+};
