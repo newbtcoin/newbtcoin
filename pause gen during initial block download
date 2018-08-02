@@ -1,0 +1,176 @@
+@@ -10,8 +10,6 @@ endif
+endif
+ifeq "$(BUILD)" "debug"
+D=d
+# note: gcc 3.x profile doesn't work
+#DEBUGFLAGS=-O0 -g -pg -D__WXDEBUG__
+DEBUGFLAGS=-g -D__WXDEBUG__
+endif
+
+@@ -36,34 +34,34 @@ all: bitcoin.exe
+headers.h.gch: headers.h $(HEADERS) net.h irc.h market.h uibase.h ui.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/util.o: util.cpp		    $(HEADERS)
+obj/util.o: util.cpp                $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/script.o: script.cpp	    $(HEADERS)
+obj/script.o: script.cpp            $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/db.o: db.cpp		    $(HEADERS) market.h
+obj/db.o: db.cpp                    $(HEADERS) market.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/net.o: net.cpp		    $(HEADERS) net.h
+obj/net.o: net.cpp                  $(HEADERS) net.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/main.o: main.cpp		    $(HEADERS) net.h market.h sha.h
+obj/main.o: main.cpp                $(HEADERS) net.h market.h sha.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/market.o: market.cpp	    $(HEADERS) market.h
+obj/market.o: market.cpp            $(HEADERS) market.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/ui.o: ui.cpp		    $(HEADERS) net.h uibase.h ui.h market.h
+obj/ui.o: ui.cpp                    $(HEADERS) net.h uibase.h ui.h market.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/uibase.o: uibase.cpp	    uibase.h
+obj/uibase.o: uibase.cpp            uibase.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/sha.o: sha.cpp		    sha.h
+obj/sha.o: sha.cpp                  sha.h
+	g++ -c $(CFLAGS) -O3 -o $@ $<
+
+obj/irc.o:  irc.cpp		    $(HEADERS)
+obj/irc.o: irc.cpp                  $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/ui_res.o: ui.rc  rc/bitcoin.ico rc/check.ico rc/send16.bmp rc/send16mask.bmp rc/send16masknoshadow.bmp rc/send20.bmp rc/send20mask.bmp rc/addressbook16.bmp rc/addressbook16mask.bmp rc/addressbook20.bmp rc/addressbook20mask.bmp
+@@ -71,8 +69,8 @@ obj/ui_res.o: ui.rc  rc/bitcoin.ico rc/check.ico rc/send16.bmp rc/send16mask.bmp
+
+
+
+OBJS=obj/util.o obj/script.o obj/db.o obj/net.o obj/main.o obj/market.o	 \
+	obj/ui.o obj/uibase.o obj/sha.o obj/irc.o obj/ui_res.o
+OBJS=obj/util.o obj/script.o obj/db.o obj/net.o obj/main.o obj/market.o \
+        obj/ui.o obj/uibase.o obj/sha.o obj/irc.o obj/ui_res.o
+
+bitcoin.exe: headers.h.gch $(OBJS)
+	-kill /f bitcoin.exe
+  @@ -22,13 +22,16 @@ INCLUDEPATHS= \
+
+LIBPATHS= \
+ -L"/usr/lib" \
+ -L"/usr/local/lib" \
+ -L"/usr/local/lib"
+
+LIBS= \
+ -Wl,-Bstatic -l boost_system -l boost_filesystem -Wl,-Bdynamic \
+ -Wl,-Bstatic -l db_cxx -l wx_gtk2$(D)-2.8 -Wl,-Bdynamic \
+ -l crypto \
+ -l gtk-x11-2.0 -l gthread-2.0 -l SM
+ -Wl,-Bstatic \
+   -l boost_system -l boost_filesystem \
+   -l db_cxx \
+   -l wx_gtk2$(D)-2.8 \
+ -Wl,-Bdynamic \
+   -l crypto \
+   -l gtk-x11-2.0 -l gthread-2.0 -l SM
+
+WXDEFS=-D__WXGTK__ -DNOPCH
+CFLAGS=-O0 -Wno-invalid-offsetof -Wformat $(DEBUGFLAGS) $(WXDEFS) $(INCLUDEPATHS)
+@@ -42,41 +45,41 @@ all: bitcoin
+headers.h.gch: headers.h $(HEADERS) net.h irc.h market.h uibase.h ui.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/util.o: util.cpp		    $(HEADERS)
+obj/util.o: util.cpp                $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/script.o: script.cpp	    $(HEADERS)
+obj/script.o: script.cpp            $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/db.o: db.cpp		    $(HEADERS) market.h
+obj/db.o: db.cpp                    $(HEADERS) market.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/net.o: net.cpp		    $(HEADERS) net.h
+obj/net.o: net.cpp                  $(HEADERS) net.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/main.o: main.cpp		    $(HEADERS) net.h market.h sha.h
+obj/main.o: main.cpp                $(HEADERS) net.h market.h sha.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/market.o: market.cpp	    $(HEADERS) market.h
+obj/market.o: market.cpp            $(HEADERS) market.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/ui.o: ui.cpp		    $(HEADERS) net.h uibase.h ui.h market.h
+obj/ui.o: ui.cpp                    $(HEADERS) net.h uibase.h ui.h market.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/uibase.o: uibase.cpp	    uibase.h
+obj/uibase.o: uibase.cpp            uibase.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/sha.o: sha.cpp		    sha.h
+obj/sha.o: sha.cpp                  sha.h
+	g++ -c $(CFLAGS) -O3 -o $@ $<
+
+obj/irc.o:  irc.cpp		    $(HEADERS)
+obj/irc.o: irc.cpp                  $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+
+
+
+OBJS=obj/util.o obj/script.o obj/db.o obj/net.o obj/main.o obj/market.o \
+	obj/ui.o obj/uibase.o obj/sha.o obj/irc.o
+        obj/ui.o obj/uibase.o obj/sha.o obj/irc.o
+
+bitcoin: headers.h.gch $(OBJS)
+	g++ $(CFLAGS) -o $@ $(LIBPATHS) $(OBJS) $(LIBS)
+ @@ -21,7 +21,6 @@ uint64 nLocalServices = (fClient ? 0 : NODE_NETWORK);
+CAddress addrLocalHost(0, DEFAULT_PORT, nLocalServices);
+CNode* pnodeLocalHost = NULL;
+uint64 nLocalHostNonce = 0;
+bool fShutdown = false;
+array<int, 10> vnThreadsRunning;
+SOCKET hListenSocket = INVALID_SOCKET;
+int64 nThreadSocketHandlerHeartbeat = INT64_MAX;
+@@ -1324,3 +1323,27 @@ bool StopNode()
+
+    return true;
+}
+
+class CNetCleanup
+{
+public:
+    CNetCleanup()
+    {
+    }
+    ~CNetCleanup()
+    {
+        // Close sockets
+        foreach(CNode* pnode, vNodes)
+            if (pnode->hSocket != INVALID_SOCKET)
+                closesocket(pnode->hSocket);
+        if (hListenSocket != INVALID_SOCKET)
+            if (closesocket(hListenSocket) == SOCKET_ERROR)
+                printf("closesocket(hListenSocket) failed with error %d\n", WSAGetLastError());
+
+#ifdef __WXMSW__
+        // Shutdown Windows Sockets
+        WSACleanup();
+#endif
+    }
+}
+instance_of_cnetcleanup;
