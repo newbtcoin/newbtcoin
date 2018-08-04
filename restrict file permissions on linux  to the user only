@@ -1,0 +1,17 @@
+@@ -79,7 +79,7 @@ CDB::CDB(const char* pszFile, const char* pszMode) : pdb(NULL)
+                             DB_THREAD     |
+                             DB_PRIVATE    |
+                             DB_RECOVER,
+                             0);
+                             S_IRUSR | S_IWUSR);
+            if (ret > 0)
+                throw runtime_error(strprintf("CDB() : error %d opening database environment\n", ret));
+            fDbEnvInit = true;
+            @@ -3494,6 +3494,7 @@ bool CMyApp::OnInit2()
+    SetAppName("Bitcoin");
+#else
+    SetAppName("bitcoin");
+    umask(077);
+#endif
+
+    //
