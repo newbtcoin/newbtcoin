@@ -1,0 +1,59 @@
+@@ -7,6 +7,7 @@ class CAddress;
+class CInv;
+class CRequestTracker;
+class CNode;
+class CBlockIndex;
+
+
+
+@@ -504,6 +505,8 @@ public:
+    map<uint256, CRequestTracker> mapRequests;
+    CCriticalSection cs_mapRequests;
+    uint256 hashContinue;
+    CBlockIndex* pindexLastGetBlocksBegin;
+    uint256 hashLastGetBlocksEnd;
+
+    // flood
+    vector<CAddress> vAddrToSend;
+@@ -541,6 +544,8 @@ public:
+        nRefCount = 0;
+        nReleaseTime = 0;
+        hashContinue = 0;
+        pindexLastGetBlocksBegin = 0;
+        hashLastGetBlocksEnd = 0;
+        fGetAddr = false;
+        vfSubscribe.assign(256, false);
+
+@@ -635,6 +640,7 @@ public:
+    }
+
+
+
+    void BeginMessage(const char* pszCommand)
+    {
+        cs_vSend.Enter();
+@@ -900,6 +906,7 @@ public:
+
+
+
+    void PushGetBlocks(CBlockIndex* pindexBegin, uint256 hashEnd);
+    bool IsSubscribed(unsigned int nChannel);
+    void Subscribe(unsigned int nChannel, unsigned int nHops=0);
+    void CancelSubscribe(unsigned int nChannel);
+   @@ -20,7 +20,7 @@ class CDataStream;
+class CAutoFile;
+
+static const int VERSION = 200;
+static const char* pszSubVer = " rc1";
+static const char* pszSubVer = " rc2";
+
+@@ -20,7 +20,7 @@ class CDataStream;
+class CAutoFile;
+
+static const int VERSION = 200;
+static const char* pszSubVer = " rc1";
+static const char* pszSubVer = " rc2";
+
+
+
+ 
