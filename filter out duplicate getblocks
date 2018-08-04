@@ -1,0 +1,132 @@
+@@ -62,6 +62,10 @@ inline T& REF(const T& val)
+#define INT64_MAX           _I64_MAX
+#define INT64_MIN           _I64_MIN
+#endif
+#ifndef S_IRUSR
+#define S_IRUSR             0400
+#define S_IWUSR             0200
+#endif
+#else
+#define WSAGetLastError()   errno
+#define WSAEWOULDBLOCK      EWOULDBLOCK
+@@ -1274,7 +1274,7 @@ bool CBlock::AcceptBlock()
+    if (!AddToBlockIndex(nFile, nBlockPos))
+        return error("AcceptBlock() : AddToBlockIndex failed");
+
+    if (hashBestChain == hash)
+    if (hashBestChain == hash && nBestHeight > 28000)
+        RelayInventory(CInv(MSG_BLOCK, hash));
+
+    // // Add atoms to user reviews for coins created
+@@ -1314,7 +1314,7 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
+
+        // Ask this guy to fill in what we're missing
+        if (pfrom)
+            pfrom->PushMessage("getblocks", CBlockLocator(pindexBest), GetOrphanRoot(pblock));
+            pfrom->PushGetBlocks(pindexBest, GetOrphanRoot(pblock));
+        return true;
+    }
+
+@@ -1816,7 +1816,7 @@ bool ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
+        if (!fAskedForBlocks && !pfrom->fClient)
+        {
+            fAskedForBlocks = true;
+            pfrom->PushMessage("getblocks", CBlockLocator(pindexBest), uint256(0));
+            pfrom->PushGetBlocks(pindexBest, uint256(0));
+        }
+
+        pfrom->fSuccessfullyConnected = true;
+@@ -1836,6 +1836,8 @@ bool ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
+    {
+        vector<CAddress> vAddr;
+        vRecv >> vAddr;
+        if (vAddr.size() > 50000) // lower this to 1000 later
+            return error("message addr size() = %d", vAddr.size());
+
+        // Store the new addresses
+        CAddrDB addrdb;
+@@ -1864,6 +1866,8 @@ bool ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
+    {
+        vector<CInv> vInv;
+        vRecv >> vInv;
+        if (vInv.size() > 50000)
+            return error("message inv size() = %d", vInv.size());
+
+        CTxDB txdb("r");
+        foreach(const CInv& inv, vInv)
+@@ -1878,7 +1882,7 @@ bool ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
+            if (!fAlreadyHave)
+                pfrom->AskFor(inv);
+            else if (inv.type == MSG_BLOCK && mapOrphanBlocks.count(inv.hash))
+                pfrom->PushMessage("getblocks", CBlockLocator(pindexBest), GetOrphanRoot(mapOrphanBlocks[inv.hash]));
+                pfrom->PushGetBlocks(pindexBest, GetOrphanRoot(mapOrphanBlocks[inv.hash]));
+
+            // Track requests for our stuff
+            CRITICAL_BLOCK(cs_mapRequestCount)
+@@ -1895,6 +1899,8 @@ bool ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
+    {
+        vector<CInv> vInv;
+        vRecv >> vInv;
+        if (vInv.size() > 50000)
+            return error("message getdata size() = %d", vInv.size());
+
+        foreach(const CInv& inv, vInv)
+        {
+@@ -2210,17 +2216,6 @@ bool SendMessages(CNode* pto)
+            }
+        }
+
+        // Clear inventory known periodically in case an inv message was missed,
+        // although usually they would just get it from another node.
+        static int64 nLastInventoryKnownClear;
+        if (GetTime() - nLastInventoryKnownClear > 2 * 60 * 60) // every 2 hours
+        {
+            nLastInventoryKnownClear = GetTime();
+            CRITICAL_BLOCK(cs_vNodes)
+                foreach(CNode* pnode, vNodes)
+                    pnode->setInventoryKnown.clear();
+        }
+
+
+        //
+        // Message: addr
+        @@ -40,6 +40,23 @@ CAddress addrProxy("127.0.0.1:9050");
+
+
+
+
+
+void CNode::PushGetBlocks(CBlockIndex* pindexBegin, uint256 hashEnd)
+{
+    // Filter out duplicate requests
+    if (pindexBegin == pindexLastGetBlocksBegin && hashEnd == hashLastGetBlocksEnd)
+        return;
+    pindexLastGetBlocksBegin = pindexBegin;
+    hashLastGetBlocksEnd = hashEnd;
+
+    PushMessage("getblocks", CBlockLocator(pindexBegin), hashEnd);
+}
+
+
+
+
+
+bool ConnectSocket(const CAddress& addrConnect, SOCKET& hSocketRet)
+{
+    hSocketRet = INVALID_SOCKET;
+@@ -764,12 +781,12 @@ void ThreadSocketHandler2(void* parg)
+                    printf("socket no message in first 60 seconds, %d %d\n", pnode->nLastRecv != 0, pnode->nLastSend != 0);
+                    pnode->fDisconnect = true;
+                }
+                else if (GetTime() - pnode->nLastSend > 10 * 60 && GetTime() - pnode->nLastSendEmpty > 10 * 60)
+                else if (GetTime() - pnode->nLastSend > 90*60 && GetTime() - pnode->nLastSendEmpty > 90*60)
+                {
+                    printf("socket not sending\n");
+                    pnode->fDisconnect = true;
+                }
+                else if (GetTime() - pnode->nLastRecv > (pnode->nVersion >= 107 ? 15*60 : 90*60))
+                else if (GetTime() - pnode->nLastRecv > 90*60)
+                {
+                    printf("socket inactivity timeout\n");
+                    pnode->fDisconnect = true;
+                    
