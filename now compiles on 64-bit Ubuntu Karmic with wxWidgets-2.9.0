@@ -1,0 +1,465 @@
+@@ -1,6 +1,6 @@
+Bitcoin v0.2.0 BETA
+
+Copyright (c) 2009 Satoshi Nakamoto
+Copyright (c) 2009-2010 Satoshi Nakamoto
+Distributed under the MIT/X11 software license, see the accompanying
+file license.txt or http://www.opensource.org/licenses/mit-license.php.
+This product includes software developed by the OpenSSL Project for use in
+@@ -13,15 +13,22 @@ UNIX BUILD NOTES
+
+Dependencies
+------------
+apt-get install build-essential
+apt-get install libgtk2.0-dev
+apt-get install libssl-dev
+apt-get install libdb4.7-dev
+apt-get install libdb4.7++-dev
+apt-get install libboost-dev
+sudo apt-get install build-essential
+sudo apt-get install libgtk2.0-dev
+sudo apt-get install libssl-dev
+sudo apt-get install libdb4.7-dev
+sudo apt-get install libdb4.7++-dev
+sudo apt-get install libboost-dev
+
+There is currently no libwxgtk2.8-ansi-dev debian package for Karmic.
+libwxgtk2.8-dev is the "unicode" build, but for wxWidgets 2.8 "unicode"
+means wchar, not UTF-8.  wchar wxString doesn't convert to std::string.
+
+In wxWidgets 2.9, unicode is UTF-8 and that's the only version.
+
+You need to download wxWidgets from http://www.wxwidgets.org/downloads/
+and build it yourself.
+and build it yourself.  See the build instructions and configure parameters
+below.
+
+Licenses of statically linked libraries:
+wxWidgets      LGPL 2.1 with very liberal exceptions
+@@ -48,7 +55,7 @@ symbols, which reduces the executable size by about 90%.
+
+wxWidgets
+---------
+cd /usr/local/wxWidgets-2.8.9
+cd /usr/local/wxWidgets-2.8.9 or 2.9.0
+mkdir buildgtk
+cd buildgtk
+../configure --with-gtk --enable-debug --disable-shared --enable-monolithic
+@@ -0,0 +1,89 @@
+# Copyright (c) 2009 Satoshi Nakamoto
+# Distributed under the MIT/X11 software license, see the accompanying
+# file license.txt or http://www.opensource.org/licenses/mit-license.php.
+
+
+ifneq "$(BUILD)" "debug"
+ifneq "$(BUILD)" "release"
+BUILD=debug
+endif
+endif
+ifeq "$(BUILD)" "debug"
+D=d
+DEBUGFLAGS=-g -D__WXDEBUG__
+endif
+
+
+
+INCLUDEPATHS= \
+ -I"/usr/include" \
+ -I"/usr/local/include/wx-2.8" \
+ -I"/usr/local/lib/wx/include/gtk2-ansi-debug-static-2.8"
+
+LIBPATHS= \
+ -L"/usr/lib" \
+ -L"/usr/local/lib"
+
+LIBS= \
+ -Wl,-Bstatic \
+   -l boost_system -l boost_filesystem \
+   -l db_cxx \
+   -l wx_gtk2$(D)-2.8 \
+ -Wl,-Bdynamic \
+   -l crypto \
+   -l gtk-x11-2.0 -l gthread-2.0 -l SM
+
+WXDEFS=-D__WXGTK__ -DNOPCH
+CFLAGS=-O0 -Wno-invalid-offsetof -Wformat $(DEBUGFLAGS) $(WXDEFS) $(INCLUDEPATHS)
+HEADERS=headers.h util.h main.h serialize.h uint256.h key.h bignum.h script.h db.h base58.h
+
+
+
+all: bitcoin
+
+
+headers.h.gch: headers.h $(HEADERS) net.h irc.h market.h uibase.h ui.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/util.o: util.cpp                $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/script.o: script.cpp            $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/db.o: db.cpp                    $(HEADERS) market.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/net.o: net.cpp                  $(HEADERS) net.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/main.o: main.cpp                $(HEADERS) net.h market.h sha.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/market.o: market.cpp            $(HEADERS) market.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/ui.o: ui.cpp                    $(HEADERS) net.h uibase.h ui.h market.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/uibase.o: uibase.cpp            uibase.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/sha.o: sha.cpp                  sha.h
+	g++ -c $(CFLAGS) -O3 -o $@ $<
+
+obj/irc.o: irc.cpp                  $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+
+
+
+OBJS=obj/util.o obj/script.o obj/db.o obj/net.o obj/main.o obj/market.o \
+        obj/ui.o obj/uibase.o obj/sha.o obj/irc.o
+
+bitcoin: headers.h.gch $(OBJS)
+	g++ $(CFLAGS) -o $@ $(LIBPATHS) $(OBJS) $(LIBS)
+
+clean:
+	-rm obj/*
+	-rm headers.h.gch
+  @@ -0,0 +1,89 @@
+# Copyright (c) 2009 Satoshi Nakamoto
+# Distributed under the MIT/X11 software license, see the accompanying
+# file license.txt or http://www.opensource.org/licenses/mit-license.php.
+
+
+ifneq "$(BUILD)" "debug"
+ifneq "$(BUILD)" "release"
+BUILD=debug
+endif
+endif
+ifeq "$(BUILD)" "debug"
+D=d
+DEBUGFLAGS=-g -D__WXDEBUG__
+endif
+
+
+
+INCLUDEPATHS= \
+ -I"/usr/include" \
+ -I"/usr/local/include/wx-2.9" \
+ -I"/usr/local/lib/wx/include/gtk2-unicode-debug-static-2.9"
+
+LIBPATHS= \
+ -L"/usr/lib" \
+ -L"/usr/local/lib"
+
+LIBS= \
+ -Wl,-Bstatic \
+   -l boost_system-mt -l boost_filesystem-mt \
+   -l db_cxx \
+   -l wx_gtk2u$(D)-2.9 \
+ -Wl,-Bdynamic \
+   -l crypto \
+   -l gtk-x11-2.0 -l gthread-2.0 -l SM
+
+WXDEFS=-D__WXGTK__ -DNOPCH
+CFLAGS=-O0 -Wno-invalid-offsetof -Wformat $(DEBUGFLAGS) $(WXDEFS) $(INCLUDEPATHS)
+HEADERS=headers.h util.h main.h serialize.h uint256.h key.h bignum.h script.h db.h base58.h
+
+
+
+all: bitcoin
+
+
+headers.h.gch: headers.h $(HEADERS) net.h irc.h market.h uibase.h ui.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/util.o: util.cpp                $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/script.o: script.cpp            $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/db.o: db.cpp                    $(HEADERS) market.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/net.o: net.cpp                  $(HEADERS) net.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/main.o: main.cpp                $(HEADERS) net.h market.h sha.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/market.o: market.cpp            $(HEADERS) market.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/ui.o: ui.cpp                    $(HEADERS) net.h uibase.h ui.h market.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/uibase.o: uibase.cpp            uibase.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/sha.o: sha.cpp                  sha.h
+	g++ -c $(CFLAGS) -O3 -o $@ $<
+
+obj/irc.o: irc.cpp                  $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+
+
+
+OBJS=obj/util.o obj/script.o obj/db.o obj/net.o obj/main.o obj/market.o \
+        obj/ui.o obj/uibase.o obj/sha.o obj/irc.o
+
+bitcoin: headers.h.gch $(OBJS)
+	g++ $(CFLAGS) -o $@ $(LIBPATHS) $(OBJS) $(LIBS)
+
+clean:
+	-rm obj/*
+	-rm headers.h.gch
+  @@ -1,4 +1,4 @@
+// Copyright (c) 2009 Satoshi Nakamoto
+// Copyright (c) 2009-2010 Satoshi Nakamoto
+// Distributed under the MIT/X11 software license, see the accompanying
+// file license.txt or http://www.opensource.org/licenses/mit-license.php.
+
+@@ -252,18 +252,23 @@ bool IsCallbackAvailable(void* p)
+template<typename T>
+void AddPendingCustomEvent(wxEvtHandler* pevthandler, int nEventID, const T pbeginIn, const T pendIn)
+{
+    if (!pevthandler)
+        return;
+
+    const char* pbegin = (pendIn != pbeginIn) ? &pbeginIn[0] : NULL;
+    const char* pend = pbegin + (pendIn - pbeginIn) * sizeof(pbeginIn[0]);
+    wxCommandEvent event(nEventID);
+    wxString strData(wxChar(0), (pend - pbegin) / sizeof(wxChar) + 1);
+    memcpy(&strData[0], pbegin, pend - pbegin);
+    event.SetString(strData);
+    event.SetInt(pend - pbegin);
+
+    pevthandler->AddPendingEvent(event);
+    // Need to rewrite with something like UIThreadCall
+    // I'm tired of maintaining this hack that's only called by unfinished unused code,
+    // but I'm not willing to delete it because it serves as documentation of what the
+    // unfinished code was trying to do.
+    assert(("Unimplemented", 0));
+    //if (!pevthandler)
+    //    return;
+    //
+    //const char* pbegin = (pendIn != pbeginIn) ? &pbeginIn[0] : NULL;
+    //const char* pend = pbegin + (pendIn - pbeginIn) * sizeof(pbeginIn[0]);
+    //wxCommandEvent event(nEventID);
+    //wxString strData(wxChar(0), (pend - pbegin) / sizeof(wxChar) + 1);
+    //memcpy(&strData[0], pbegin, pend - pbegin);
+    //event.SetString(strData);
+    //event.SetInt(pend - pbegin);
+    //
+    //pevthandler->AddPendingEvent(event);
+}
+
+template<class T>
+@@ -335,9 +340,8 @@ CMainFrame::CMainFrame(wxWindow* parent) : CMainFrameBase(parent)
+    m_toolBar->AddTool(wxID_BUTTONRECEIVE, "Address Book", wxBitmap(addressbook20_xpm), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
+    m_toolBar->Realize();
+    // resize to fit ubuntu's huge default font
+    dResize = 1.19;
+    SetSize(dResize * GetSize().GetWidth(), 1.1 * GetSize().GetHeight());
+    dResize = 1.20;
+    SetSize(dResize * GetSize().GetWidth(), 1.1 * GetSize().GetHeight());
+#endif
+    m_staticTextBalance->SetLabel(FormatMoney(GetBalance()) + "  ");
+    m_listCtrl->SetFocus();
+@@ -458,6 +462,8 @@ void CMainFrame::OnIconize(wxIconizeEvent& event)
+{
+    // Hide the task bar button when minimized.
+    // Event is sent when the frame is minimized or restored.
+    // wxWidgets 2.8.9 doesn't have IsIconized() so there's no way
+    // to get rid of the deprecated warning.  Just ignore it.
+    if (!event.Iconized())
+        fClosedToTray = false;
+#ifndef __WXMSW__
+@@ -985,7 +991,7 @@ void ThreadDelayedRepaint(void* parg)
+                printf("DelayedRepaint\n");
+                wxPaintEvent event;
+                pframeMain->fRefresh = true;
+                pframeMain->AddPendingEvent(event);
+                pframeMain->GetEventHandler()->AddPendingEvent(event);
+            }
+        }
+        Sleep(nRepaintInterval);
+@@ -1010,7 +1016,7 @@ void MainFrameRepaint()
+        printf("MainFrameRepaint\n");
+        wxPaintEvent event;
+        pframeMain->fRefresh = true;
+        pframeMain->AddPendingEvent(event);
+        pframeMain->GetEventHandler()->AddPendingEvent(event);
+    }
+}
+
+@@ -1695,12 +1701,14 @@ CAboutDialog::CAboutDialog(wxWindow* parent) : CAboutDialogBase(parent)
+
+    // Workaround until upgrade to wxWidgets supporting UTF-8
+    wxString str = m_staticTextMain->GetLabel();
+#if !wxUSE_UNICODE
+    if (str.Find('�') != wxNOT_FOUND)
+        str.Remove(str.Find('�'), 1);
+    m_staticTextMain->SetLabel(str);
+#endif
+#ifndef __WXMSW__
+    SetSize(510, 380);
+#endif
+    m_staticTextMain->SetLabel(str);
+}
+
+void CAboutDialog::OnButtonOK(wxCommandEvent& event)
+@@ -1732,7 +1740,7 @@ CSendDialog::CSendDialog(wxWindow* parent, const wxString& strAddress) : CSendDi
+    if (fontTmp.GetPointSize() > 9);
+        fontTmp.SetPointSize(9);
+    m_staticTextInstructions->SetFont(fontTmp);
+    SetSize(725, wxDefaultCoord);
+    SetSize(725, 380);
+#endif
+
+    // Set Icon
+@@ -2000,7 +2008,7 @@ void CSendingDialog::Repaint()
+{
+    Refresh();
+    wxPaintEvent event;
+    AddPendingEvent(event);
+    GetEventHandler()->AddPendingEvent(event);
+}
+
+bool CSendingDialog::Status()
+@@ -3379,14 +3387,14 @@ void CMyTaskBarIcon::OnMenuOptions(wxCommandEvent& event)
+{
+    // Since it's modal, get the main window to do it
+    wxCommandEvent event2(wxEVT_COMMAND_MENU_SELECTED, wxID_MENUOPTIONSOPTIONS);
+    pframeMain->AddPendingEvent(event2);
+    pframeMain->GetEventHandler()->AddPendingEvent(event2);
+}
+
+void CMyTaskBarIcon::Restore()
+{
+    pframeMain->Show();
+    wxIconizeEvent event(0, false);
+    pframeMain->AddPendingEvent(event);
+    pframeMain->GetEventHandler()->AddPendingEvent(event);
+    pframeMain->Iconize(false);
+    pframeMain->Raise();
+}
+@@ -3548,7 +3556,7 @@ bool CMyApp::OnInit2()
+    if (!fDebug && !pszSetDataDir[0])
+        ShrinkDebugFile();
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+    printf("Bitcoin version %d%s, OS version %s\n", VERSION, pszSubVer, wxGetOsDescription().mb_str());
+    printf("Bitcoin version %d%s, OS version %s\n", VERSION, pszSubVer, ((string)wxGetOsDescription()).c_str());
+
+    if (mapArgs.count("-loadblockindextest"))
+    {
+  @@ -1,3 +1,7 @@
+// Copyright (c) 2009-2010 Satoshi Nakamoto
+// Distributed under the MIT/X11 software license, see the accompanying
+// file license.txt or http://www.opensource.org/licenses/mit-license.php.
+
+///////////////////////////////////////////////////////////////////////////
+// C++ code generated with wxFormBuilder (version Apr 16 2008)
+// http://www.wxformbuilder.org/
+@@ -639,7 +643,7 @@ CSendDialogBase::CSendDialogBase( wxWindow* parent, wxWindowID id, const wxStrin
+	bSizer21->Add( 0, 5, 0, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer1;
+	fgSizer1 = new wxFlexGridSizer( 3, 2, 0, 0 );
+	fgSizer1 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer1->AddGrowableCol( 1 );
+	fgSizer1->SetFlexibleDirection( wxBOTH );
+	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+  @@ -1,3 +1,7 @@
+// Copyright (c) 2009-2010 Satoshi Nakamoto
+// Distributed under the MIT/X11 software license, see the accompanying
+// file license.txt or http://www.opensource.org/licenses/mit-license.php.
+
+///////////////////////////////////////////////////////////////////////////
+// C++ code generated with wxFormBuilder (version Apr 16 2008)
+// http://www.wxformbuilder.org/
+@@ -158,7 +162,7 @@ class CMainFrameBase : public wxFrame
+		wxListCtrl* m_listCtrlOrdersSent;
+		wxListCtrl* m_listCtrlProductsSent;
+		wxListCtrl* m_listCtrlOrdersReceived;
+		CMainFrameBase( wxWindow* parent, wxWindowID id = wxID_MAINFRAME, const wxString& title = wxT("Bitcoin"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 725,484 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		CMainFrameBase( wxWindow* parent, wxWindowID id = wxID_MAINFRAME, const wxString& title = wxT("Bitcoin"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 727,484 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		~CMainFrameBase();
+	
+};
+@@ -32,7 +32,7 @@
+            <property name="minimum_size"></property>
+            <property name="name">CMainFrameBase</property>
+            <property name="pos"></property>
+            <property name="size">725,484</property>
+            <property name="size">727,484</property>
+            <property name="style">wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER</property>
+            <property name="subclass"></property>
+            <property name="title">Bitcoin</property>
+@@ -3509,7 +3509,7 @@
+                </object>
+            </object>
+        </object>
+        <object class="Dialog" expanded="0">
+        <object class="Dialog" expanded="1">
+            <property name="bg"></property>
+            <property name="center"></property>
+            <property name="context_help"></property>
+@@ -3580,7 +3580,7 @@
+                    <property name="border">5</property>
+                    <property name="flag">wxEXPAND|wxLEFT</property>
+                    <property name="proportion">0</property>
+                    <object class="wxFlexGridSizer" expanded="0">
+                    <object class="wxFlexGridSizer" expanded="1">
+                        <property name="cols">2</property>
+                        <property name="flexible_direction">wxBOTH</property>
+                        <property name="growablecols">1</property>
+@@ -3590,7 +3590,7 @@
+                        <property name="name">fgSizer1</property>
+                        <property name="non_flexible_grow_mode">wxFLEX_GROWMODE_SPECIFIED</property>
+                        <property name="permission">none</property>
+                        <property name="rows">3</property>
+                        <property name="rows">0</property>
+                        <property name="vgap">0</property>
+                        <object class="sizeritem" expanded="1">
+                            <property name="border">5</property>
+@@ -4189,7 +4189,7 @@
+                    <property name="border">5</property>
+                    <property name="flag">wxEXPAND</property>
+                    <property name="proportion">0</property>
+                    <object class="wxBoxSizer" expanded="1">
+                    <object class="wxBoxSizer" expanded="0">
+                        <property name="minimum_size"></property>
+                        <property name="name">bSizer672</property>
+                        <property name="orient">wxHORIZONTAL</property>
+@@ -4317,7 +4317,7 @@
+                    <property name="border">5</property>
+                    <property name="flag">wxEXPAND</property>
+                    <property name="proportion">1</property>
+                    <object class="wxBoxSizer" expanded="1">
+                    <object class="wxBoxSizer" expanded="0">
+                        <property name="minimum_size"></property>
+                        <property name="name">bSizer67</property>
+                        <property name="orient">wxHORIZONTAL</property>
+@@ -4445,7 +4445,7 @@
+                    <property name="border">5</property>
+                    <property name="flag">wxEXPAND</property>
+                    <property name="proportion">0</property>
+                    <object class="wxBoxSizer" expanded="1">
+                    <object class="wxBoxSizer" expanded="0">
+                        <property name="minimum_size"></property>
+                        <property name="name">bSizer23</property>
+                        <property name="orient">wxHORIZONTAL</property>
+                        
