@@ -1,0 +1,474 @@
+@@ -134,8 +134,6 @@ void CDB::Close()
+
+    CRITICAL_BLOCK(cs_db)
+        --mapFileUseCount[strFile];
+
+    RandAddSeed();
+}
+
+void CloseDb(const string& strFile)
+@@ -456,7 +454,7 @@ bool CAddrDB::LoadAddresses()
+                    CAddress addr(psz, NODE_NETWORK);
+                    addr.nTime = 0; // so it won't relay unless successfully connected
+                    if (addr.IsValid())
+                        AddAddress(*this, addr);
+                        AddAddress(addr);
+                }
+            }
+            catch (...) { }
+            @@ -265,8 +265,7 @@ void ThreadIRCSeed(void* parg)
+                if (DecodeAddress(pszName, addr))
+                {
+                    addr.nTime = GetAdjustedTime() - 51 * 60;
+                    CAddrDB addrdb;
+                    if (AddAddress(addrdb, addr))
+                    if (AddAddress(addr))
+                        printf("IRC got new address\n");
+                    nGotIRCAddresses++;
+                }
+      @@ -1734,6 +1734,11 @@ bool ProcessMessages(CNode* pfrom)
+                // Allow exceptions from underlength message on vRecv
+                printf("ProcessMessage(%s, %d bytes) : Exception '%s' caught, normally caused by a message being shorter than its stated length\n", strCommand.c_str(), nMessageSize, e.what());
+            }
+            else if (strstr(e.what(), ": size too large"))
+            {
+                // Allow exceptions from overlong size
+                printf("ProcessMessage(%s, %d bytes) : Exception '%s' caught\n", strCommand.c_str(), nMessageSize, e.what());
+            }
+            else
+            {
+                PrintException(&e, "ProcessMessage()");
+@@ -1840,7 +1845,6 @@ bool ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
+            return error("message addr size() = %d", vAddr.size());
+
+        // Store the new addresses
+        CAddrDB addrdb;
+        foreach(CAddress& addr, vAddr)
+        {
+            if (fShutdown)
+@@ -1848,7 +1852,7 @@ bool ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
+            addr.nTime = GetAdjustedTime() - 2 * 60 * 60;
+            if (pfrom->fGetAddr)
+                addr.nTime -= 5 * 24 * 60 * 60;
+            AddAddress(addrdb, addr, false);
+            AddAddress(addr, false);
+            pfrom->AddAddressKnown(addr);
+            if (!pfrom->fGetAddr && addr.IsRoutable())
+            {
+         @@ -223,7 +223,7 @@ bool GetMyExternalIP(unsigned int& ipRet)
+
+
+
+bool AddAddress(CAddrDB& addrdb, CAddress addr, bool fCurrentlyOnline)
+bool AddAddress(CAddress addr, bool fCurrentlyOnline)
+{
+    if (!addr.IsRoutable())
+        return false;
+@@ -239,7 +239,7 @@ bool AddAddress(CAddrDB& addrdb, CAddress addr, bool fCurrentlyOnline)
+            // New address
+            printf("AddAddress(%s)\n", addr.ToStringLog().c_str());
+            mapAddresses.insert(make_pair(addr.GetKey(), addr));
+            addrdb.WriteAddress(addr);
+            CAddrDB().WriteAddress(addr);
+            return true;
+        }
+        else
+@@ -260,7 +260,7 @@ bool AddAddress(CAddrDB& addrdb, CAddress addr, bool fCurrentlyOnline)
+                fUpdated = true;
+            }
+            if (fUpdated)
+                addrdb.WriteAddress(addrFound);
+                CAddrDB().WriteAddress(addrFound);
+        }
+    }
+    return false;
+@@ -881,11 +881,11 @@ void ThreadOpenConnections2(void* parg)
+        vnThreadsRunning[1]--;
+        Sleep(500);
+        const int nMaxConnections = 15;
+        while (vNodes.size() >= nMaxConnections || vNodes.size() >= mapAddresses.size())
+        while (vNodes.size() >= nMaxConnections)
+        {
+            Sleep(2000);
+            if (fShutdown)
+                return;
+            Sleep(2000);
+        }
+        vnThreadsRunning[1]++;
+        if (fShutdown)
+      @@ -23,7 +23,7 @@ enum
+
+bool ConnectSocket(const CAddress& addrConnect, SOCKET& hSocketRet);
+bool GetMyExternalIP(unsigned int& ipRet);
+bool AddAddress(CAddrDB& addrdb, CAddress addr, bool fCurrentlyOnline=true);
+bool AddAddress(CAddress addr, bool fCurrentlyOnline=true);
+void AddressCurrentlyConnected(const CAddress& addr);
+CNode* FindNode(unsigned int ip);
+CNode* ConnectNode(CAddress addrConnect, int64 nTimeout=0);
+@@ -627,7 +627,7 @@ public:
+        // We're using mapAskFor as a priority queue,
+        // the key is the earliest time the request can be sent
+        int64& nRequestTime = mapAlreadyAskedFor[inv];
+        printf("askfor %s  %"PRI64d"\n", inv.ToString().c_str(), nRequestTime);
+        printf("askfor %s   %"PRI64d"\n", inv.ToString().c_str(), nRequestTime);
+
+        // Make sure not to reuse time indexes to keep things in the same order
+        int64 nNow = (GetTime() - 1) * 1000000;
+        @@ -20,7 +20,7 @@ class CDataStream;
+class CAutoFile;
+
+static const int VERSION = 200;
+static const char* pszSubVer = " rc2";
+static const char* pszSubVer = " test1";
+
+
+
+@@ -194,28 +194,32 @@ uint64 ReadCompactSize(Stream& is)
+{
+    unsigned char chSize;
+    READDATA(is, chSize);
+    uint64 nSizeRet = 0;
+    if (chSize < UCHAR_MAX-2)
+    {
+        return chSize;
+        nSizeRet = chSize;
+    }
+    else if (chSize == UCHAR_MAX-2)
+    {
+        unsigned short nSize;
+        READDATA(is, nSize);
+        return nSize;
+        nSizeRet = nSize;
+    }
+    else if (chSize == UCHAR_MAX-1)
+    {
+        unsigned int nSize;
+        READDATA(is, nSize);
+        return nSize;
+        nSizeRet = nSize;
+    }
+    else
+    {
+        uint64 nSize;
+        READDATA(is, nSize);
+        return nSize;
+        nSizeRet = nSize;
+    }
+    if (nSizeRet > (uint64)INT_MAX)
+        throw std::ios_base::failure("ReadCompactSize() : size too large");
+    return nSizeRet;
+}
+
+
+@@ -460,7 +464,7 @@ void Unserialize_impl(Stream& is, std::vector<T, A>& v, int nType, int nVersion,
+    unsigned int i = 0;
+    while (i < nSize)
+    {
+        unsigned int blk = min(nSize - i, 1 + 4999999 / sizeof(T));
+        unsigned int blk = min(nSize - i, (unsigned int)(1 + 4999999 / sizeof(T)));
+        v.resize(i + blk);
+        is.read((char*)&v[i], blk * sizeof(T));
+        i += blk;
+    @@ -349,7 +349,7 @@ CMainFrame::CMainFrame(wxWindow* parent) : CMainFrameBase(parent)
+        nDateWidth += 12;
+    m_listCtrl->InsertColumn(0, "",             wxLIST_FORMAT_LEFT,  dResize * 0);
+    m_listCtrl->InsertColumn(1, "",             wxLIST_FORMAT_LEFT,  dResize * 0);
+    m_listCtrl->InsertColumn(2, "Status",       wxLIST_FORMAT_LEFT,  dResize * 90);
+    m_listCtrl->InsertColumn(2, "Status",       wxLIST_FORMAT_LEFT,  dResize * 110);
+    m_listCtrl->InsertColumn(3, "Date",         wxLIST_FORMAT_LEFT,  dResize * nDateWidth);
+    m_listCtrl->InsertColumn(4, "Description",  wxLIST_FORMAT_LEFT,  dResize * 409 - nDateWidth);
+    m_listCtrl->InsertColumn(5, "Debit",        wxLIST_FORMAT_RIGHT, dResize * 79);
+@@ -579,7 +579,7 @@ string FormatTxStatus(const CWalletTx& wtx)
+        else if (nDepth < 6)
+            return strprintf("%d/unconfirmed", nDepth);
+        else
+            return strprintf("%d blocks", nDepth);
+            return strprintf("%d confirmations", nDepth);
+    }
+}
+
+@@ -3706,13 +3706,12 @@ bool CMyApp::OnInit2()
+
+    if (mapArgs.count("-addnode"))
+    {
+        CAddrDB addrdb;
+        foreach(string strAddr, mapMultiArgs["-addnode"])
+        {
+            CAddress addr(strAddr, NODE_NETWORK);
+            addr.nTime = 0; // so it won't relay unless successfully connected
+            if (addr.IsValid())
+                AddAddress(addrdb, addr);
+                AddAddress(addr);
+        }
+    }
+
+@@ -3934,3 +3933,13 @@ void SetStartOnSystemStartup(bool fAutoStart)
+bool GetStartOnSystemStartup() { return false; }
+void SetStartOnSystemStartup(bool fAutoStart) { }
+#endif
+
+
+
+@@ -158,7 +158,7 @@ class CMainFrameBase : public wxFrame
+		wxListCtrl* m_listCtrlOrdersSent;
+		wxListCtrl* m_listCtrlProductsSent;
+		wxListCtrl* m_listCtrlOrdersReceived;
+		CMainFrameBase( wxWindow* parent, wxWindowID id = wxID_MAINFRAME, const wxString& title = wxT("Bitcoin"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 705,484 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		CMainFrameBase( wxWindow* parent, wxWindowID id = wxID_MAINFRAME, const wxString& title = wxT("Bitcoin"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 725,484 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		~CMainFrameBase();
+	
+};
+
+@@ -32,7 +32,7 @@
+            <property name="minimum_size"></property>
+            <property name="name">CMainFrameBase</property>
+            <property name="pos"></property>
+            <property name="size">705,484</property>
+            <property name="size">725,484</property>
+            <property name="style">wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER</property>
+            <property name="subclass"></property>
+            <property name="title">Bitcoin</property>
+@@ -1737,7 +1737,7 @@
+            <event name="OnSetFocus"></event>
+            <event name="OnSize"></event>
+            <event name="OnUpdateUI"></event>
+            <object class="wxBoxSizer" expanded="1">
+            <object class="wxBoxSizer" expanded="0">
+                <property name="minimum_size"></property>
+                <property name="name">bSizer55</property>
+                <property name="orient">wxVERTICAL</property>
+                
+
+@@ -8,8 +8,8 @@
+map<string, string> mapArgs;
+map<string, vector<string> > mapMultiArgs;
+bool fDebug = false;
+bool fPrintToDebugger = false;
+bool fPrintToConsole = false;
+bool fPrintToDebugger = false;
+char pszSetDataDir[MAX_PATH] = "";
+bool fShutdown = false;
+
+@@ -75,6 +75,8 @@ void RandAddSeed()
+
+void RandAddSeedPerfmon()
+{
+    RandAddSeed();
+
+    // This can take up to 2 seconds, so only do it every 10 minutes
+    static int64 nLastPerfmon;
+    if (GetTime() < nLastPerfmon + 10 * 60)
+@@ -129,6 +131,79 @@ uint64 GetRand(uint64 nMax)
+
+
+
+inline int OutputDebugStringF(const char* pszFormat, ...)
+{
+    int ret = 0;
+    if (fPrintToConsole || wxTheApp == NULL)
+    {
+        // print to console
+        va_list arg_ptr;
+        va_start(arg_ptr, pszFormat);
+        ret = vprintf(pszFormat, arg_ptr);
+        va_end(arg_ptr);
+    }
+    else
+    {
+        // print to debug.log
+        char pszFile[MAX_PATH+100];
+        GetDataDir(pszFile);
+        strlcat(pszFile, "/debug.log", sizeof(pszFile));
+        FILE* fileout = fopen(pszFile, "a");
+        if (fileout)
+        {
+            //// Debug print useful for profiling
+            //fprintf(fileout, " %"PRI64d" ", wxGetLocalTimeMillis().GetValue());
+            va_list arg_ptr;
+            va_start(arg_ptr, pszFormat);
+            ret = vfprintf(fileout, pszFormat, arg_ptr);
+            va_end(arg_ptr);
+            fclose(fileout);
+        }
+    }
+
+#ifdef __WXMSW__
+    if (fPrintToDebugger)
+    {
+        // accumulate a line at a time
+        static CCriticalSection cs_OutputDebugStringF;
+        CRITICAL_BLOCK(cs_OutputDebugStringF)
+        {
+            static char pszBuffer[50000];
+            static char* pend;
+            if (pend == NULL)
+                pend = pszBuffer;
+            va_list arg_ptr;
+            va_start(arg_ptr, pszFormat);
+            int limit = END(pszBuffer) - pend - 2;
+            int ret = _vsnprintf(pend, limit, pszFormat, arg_ptr);
+            va_end(arg_ptr);
+            if (ret < 0 || ret >= limit)
+            {
+                pend = END(pszBuffer) - 2;
+                *pend++ = '\n';
+            }
+            else
+                pend += ret;
+            *pend = '\0';
+            char* p1 = pszBuffer;
+            char* p2;
+            while (p2 = strchr(p1, '\n'))
+            {
+                p2++;
+                char c = *p2;
+                *p2 = '\0';
+                OutputDebugString(p1);
+                *p2 = c;
+                p1 = p2;
+            }
+            if (p1 != pszBuffer)
+                memmove(pszBuffer, p1, pend - p1 + 1);
+            pend -= (p1 - pszBuffer);
+        }
+    }
+#endif
+    return ret;
+}
+
+
+// Safer snprintf
+
+@@ -112,13 +112,14 @@ inline int myclosesocket(SOCKET& hSocket)
+extern map<string, string> mapArgs;
+extern map<string, vector<string> > mapMultiArgs;
+extern bool fDebug;
+extern bool fPrintToDebugger;
+extern bool fPrintToConsole;
+extern bool fPrintToDebugger;
+extern char pszSetDataDir[MAX_PATH];
+extern bool fShutdown;
+
+void RandAddSeed();
+void RandAddSeedPerfmon();
+int OutputDebugStringF(const char* pszFormat, ...);
+int my_snprintf(char* buffer, size_t limit, const char* format, ...);
+string strprintf(const char* format, ...);
+bool error(const char* format, ...);
+@@ -219,92 +220,6 @@ public:
+
+
+
+inline int OutputDebugStringF(const char* pszFormat, ...)
+{
+    int ret = 0;
+#ifdef __WXDEBUG__
+    if (!fPrintToConsole)
+    {
+        // print to debug.log
+        char pszFile[MAX_PATH+100];
+        GetDataDir(pszFile);
+        strlcat(pszFile, "/debug.log", sizeof(pszFile));
+        FILE* fileout = fopen(pszFile, "a");
+        if (fileout)
+        {
+            //// Debug print useful for profiling
+            //fprintf(fileout, " %"PRI64d" ", wxGetLocalTimeMillis().GetValue());
+            va_list arg_ptr;
+            va_start(arg_ptr, pszFormat);
+            ret = vfprintf(fileout, pszFormat, arg_ptr);
+            va_end(arg_ptr);
+            fclose(fileout);
+        }
+    }
+
+#ifdef __WXMSW__
+    if (fPrintToDebugger)
+    {
+        // accumulate a line at a time
+        static CCriticalSection cs_OutputDebugStringF;
+        CRITICAL_BLOCK(cs_OutputDebugStringF)
+        {
+            static char pszBuffer[50000];
+            static char* pend;
+            if (pend == NULL)
+                pend = pszBuffer;
+            va_list arg_ptr;
+            va_start(arg_ptr, pszFormat);
+            int limit = END(pszBuffer) - pend - 2;
+            int ret = _vsnprintf(pend, limit, pszFormat, arg_ptr);
+            va_end(arg_ptr);
+            if (ret < 0 || ret >= limit)
+            {
+                pend = END(pszBuffer) - 2;
+                *pend++ = '\n';
+            }
+            else
+                pend += ret;
+            *pend = '\0';
+            char* p1 = pszBuffer;
+            char* p2;
+            while (p2 = strchr(p1, '\n'))
+            {
+                p2++;
+                char c = *p2;
+                *p2 = '\0';
+                OutputDebugString(p1);
+                *p2 = c;
+                p1 = p2;
+            }
+            if (p1 != pszBuffer)
+                memmove(pszBuffer, p1, pend - p1 + 1);
+            pend -= (p1 - pszBuffer);
+        }
+    }
+#endif
+#endif
+
+    if (fPrintToConsole)
+    {
+        // print to console
+        va_list arg_ptr;
+        va_start(arg_ptr, pszFormat);
+        ret = vprintf(pszFormat, arg_ptr);
+        va_end(arg_ptr);
+    }
+    return ret;
+}
+
+
+
+
+
+
+
+
+
+
+inline string i64tostr(int64 n)
+{
+    return strprintf("%"PRI64d, n);
+@@ -415,11 +330,19 @@ inline string DateTimeStrFormat(const char* pszFormat, int64 nTime)
+
+
+
+
+
+
+
+
+
+
+inline void heapchk()
+{
+#ifdef __WXMSW__
+    if (_heapchk() != _HEAPOK)
+        DebugBreak();
+    /// for debugging
+    //if (_heapchk() != _HEAPOK)
+    //    DebugBreak();
+#endif
+}
+
+
+    
