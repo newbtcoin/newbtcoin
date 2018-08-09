@@ -1,0 +1,933 @@
+@@ -1,7 +1,6 @@
+// Copyright (c) 2009-2010 Satoshi Nakamoto
+// Distributed under the MIT/X11 software license, see the accompanying
+// file license.txt or http://www.opensource.org/licenses/mit-license.php.
+
+///////////////////////////////////////////////////////////////////////////
+// C++ code generated with wxFormBuilder (version Apr 16 2008)
+// http://www.wxformbuilder.org/
+@@ -11,6 +10,7 @@
+
+#include "uibase.h"
+
+#include "xpm/about.xpm"
+#include "xpm/addressbook20.xpm"
+#include "xpm/check.xpm"
+#include "xpm/send20.xpm"
+@@ -142,81 +142,8 @@ CMainFrameBase::CMainFrameBase( wxWindow* parent, wxWindowID id, const wxString&
+	
+	bSizer2->Add( bSizer3, 0, wxEXPAND, 5 );
+	
+	m_notebook = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_panel7 = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxBoxSizer* bSizer157;
+	bSizer157 = new wxBoxSizer( wxVERTICAL );
+	
+	m_listCtrl = new wxListCtrl( m_panel7, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SORT_DESCENDING|wxVSCROLL );
+	bSizer157->Add( m_listCtrl, 1, wxEXPAND|wxALL, 5 );
+	
+	m_panel7->SetSizer( bSizer157 );
+	m_panel7->Layout();
+	bSizer157->Fit( m_panel7 );
+	m_notebook->AddPage( m_panel7, wxT("All Transactions"), false );
+	
+	bSizer2->Add( m_notebook, 1, wxEXPAND, 5 );
+	
+	wxBoxSizer* bSizer_TabsForFutureUse;
+	bSizer_TabsForFutureUse = new wxBoxSizer( wxVERTICAL );
+	
+	m_panel9 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_panel9->Hide();
+	
+	wxBoxSizer* bSizer159;
+	bSizer159 = new wxBoxSizer( wxVERTICAL );
+	
+	m_listCtrlEscrows = new wxListCtrl( m_panel9, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT );
+	bSizer159->Add( m_listCtrlEscrows, 1, wxALL|wxEXPAND, 5 );
+	
+	m_panel9->SetSizer( bSizer159 );
+	m_panel9->Layout();
+	bSizer159->Fit( m_panel9 );
+	bSizer_TabsForFutureUse->Add( m_panel9, 1, wxEXPAND | wxALL, 5 );
+	
+	m_panel8 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_panel8->Hide();
+	
+	wxBoxSizer* bSizer158;
+	bSizer158 = new wxBoxSizer( wxVERTICAL );
+	
+	m_listCtrlOrdersSent = new wxListCtrl( m_panel8, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT );
+	bSizer158->Add( m_listCtrlOrdersSent, 1, wxALL|wxEXPAND, 5 );
+	
+	m_panel8->SetSizer( bSizer158 );
+	m_panel8->Layout();
+	bSizer158->Fit( m_panel8 );
+	bSizer_TabsForFutureUse->Add( m_panel8, 1, wxEXPAND | wxALL, 5 );
+	
+	m_panel10 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_panel10->Hide();
+	
+	wxBoxSizer* bSizer160;
+	bSizer160 = new wxBoxSizer( wxVERTICAL );
+	
+	m_listCtrlProductsSent = new wxListCtrl( m_panel10, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT );
+	bSizer160->Add( m_listCtrlProductsSent, 1, wxALL|wxEXPAND, 5 );
+	
+	m_panel10->SetSizer( bSizer160 );
+	m_panel10->Layout();
+	bSizer160->Fit( m_panel10 );
+	bSizer_TabsForFutureUse->Add( m_panel10, 1, wxEXPAND | wxALL, 5 );
+	
+	m_panel11 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_panel11->Hide();
+	
+	wxBoxSizer* bSizer161;
+	bSizer161 = new wxBoxSizer( wxVERTICAL );
+	
+	m_listCtrlOrdersReceived = new wxListCtrl( m_panel11, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT );
+	bSizer161->Add( m_listCtrlOrdersReceived, 1, wxALL|wxEXPAND, 5 );
+	
+	m_panel11->SetSizer( bSizer161 );
+	m_panel11->Layout();
+	bSizer161->Fit( m_panel11 );
+	bSizer_TabsForFutureUse->Add( m_panel11, 1, wxEXPAND | wxALL, 5 );
+	
+	bSizer2->Add( bSizer_TabsForFutureUse, 1, wxEXPAND, 5 );
+	m_listCtrl = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SORT_DESCENDING|wxVSCROLL );
+	bSizer2->Add( m_listCtrl, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( bSizer2 );
+	this->Layout();
+@@ -267,11 +194,8 @@ CMainFrameBase::CMainFrameBase( wxWindow* parent, wxWindowID id, const wxString&
+	m_buttonCopy->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CMainFrameBase::OnButtonCopy ), NULL, this );
+	m_button91->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CMainFrameBase::OnButtonChange ), NULL, this );
+	m_listCtrl->Connect( wxEVT_COMMAND_LIST_COL_BEGIN_DRAG, wxListEventHandler( CMainFrameBase::OnListColBeginDrag ), NULL, this );
+	m_listCtrl->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( CMainFrameBase::OnListItemActivatedAllTransactions ), NULL, this );
+	m_listCtrl->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( CMainFrameBase::OnListItemActivated ), NULL, this );
+	m_listCtrl->Connect( wxEVT_PAINT, wxPaintEventHandler( CMainFrameBase::OnPaintListCtrl ), NULL, this );
+	m_listCtrlOrdersSent->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( CMainFrameBase::OnListItemActivatedOrdersSent ), NULL, this );
+	m_listCtrlProductsSent->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( CMainFrameBase::OnListItemActivatedProductsSent ), NULL, this );
+	m_listCtrlOrdersReceived->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( CMainFrameBase::OnListItemActivatedOrdersReceived ), NULL, this );
+}
+
+CMainFrameBase::~CMainFrameBase()
+@@ -322,11 +246,8 @@ CMainFrameBase::~CMainFrameBase()
+	m_buttonCopy->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CMainFrameBase::OnButtonCopy ), NULL, this );
+	m_button91->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CMainFrameBase::OnButtonChange ), NULL, this );
+	m_listCtrl->Disconnect( wxEVT_COMMAND_LIST_COL_BEGIN_DRAG, wxListEventHandler( CMainFrameBase::OnListColBeginDrag ), NULL, this );
+	m_listCtrl->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( CMainFrameBase::OnListItemActivatedAllTransactions ), NULL, this );
+	m_listCtrl->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( CMainFrameBase::OnListItemActivated ), NULL, this );
+	m_listCtrl->Disconnect( wxEVT_PAINT, wxPaintEventHandler( CMainFrameBase::OnPaintListCtrl ), NULL, this );
+	m_listCtrlOrdersSent->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( CMainFrameBase::OnListItemActivatedOrdersSent ), NULL, this );
+	m_listCtrlProductsSent->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( CMainFrameBase::OnListItemActivatedProductsSent ), NULL, this );
+	m_listCtrlOrdersReceived->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( CMainFrameBase::OnListItemActivatedOrdersReceived ), NULL, this );
+}
+
+CTxDetailsDialogBase::CTxDetailsDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+@@ -562,20 +483,23 @@ CAboutDialogBase::CAboutDialogBase( wxWindow* parent, wxWindowID id, const wxStr
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* bSizer63;
+	bSizer63 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_bitmap = new wxStaticBitmap( this, wxID_ANY, wxBitmap( about_xpm ), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer63->Add( m_bitmap, 0, 0, 5 );
+	
+	wxBoxSizer* bSizer60;
+	bSizer60 = new wxBoxSizer( wxVERTICAL );
+	
+	wxBoxSizer* bSizer62;
+	bSizer62 = new wxBoxSizer( wxHORIZONTAL );
+	
+	wxBoxSizer* bSizer631;
+	bSizer631 = new wxBoxSizer( wxVERTICAL );
+	
+	bSizer62->Add( 60, 0, 0, wxEXPAND, 5 );
+	
+	wxBoxSizer* bSizer63;
+	bSizer63 = new wxBoxSizer( wxVERTICAL );
+	
+	
+	bSizer63->Add( 0, 50, 0, wxEXPAND, 5 );
+	bSizer631->Add( 0, 65, 0, wxEXPAND, 5 );
+	
+	wxBoxSizer* bSizer64;
+	bSizer64 = new wxBoxSizer( wxHORIZONTAL );
+@@ -592,19 +516,19 @@ CAboutDialogBase::CAboutDialogBase( wxWindow* parent, wxWindowID id, const wxStr
+	
+	bSizer64->Add( m_staticTextVersion, 0, wxALIGN_BOTTOM|wxTOP|wxBOTTOM|wxRIGHT, 5 );
+	
+	bSizer63->Add( bSizer64, 0, wxEXPAND, 5 );
+	bSizer631->Add( bSizer64, 0, wxEXPAND, 5 );
+	
+	
+	bSizer63->Add( 0, 4, 0, wxEXPAND, 5 );
+	bSizer631->Add( 0, 4, 0, wxEXPAND, 5 );
+	
+	m_staticTextMain = new wxStaticText( this, wxID_ANY, wxT("Copyright © 2009 Satoshi Nakamoto.\n\nThis is experimental software.  Do not rely on it for actual financial transactions.\n\nDistributed under the MIT/X11 software license, see the accompanying file license.txt or http://www.opensource.org/licenses/mit-license.php.\n\nThis product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (http://www.openssl.org/) and cryptographic software written by Eric Young (eay@cryptsof...(line truncated)...
+	m_staticTextMain->Wrap( 400 );
+	bSizer63->Add( m_staticTextMain, 0, wxALL, 5 );
+	m_staticTextMain = new wxStaticText( this, wxID_ANY, wxT("Copyright © 2009-2010 Satoshi Nakamoto.\n\nThis is experimental software.  Do not rely on it for actual financial transactions.\n\nDistributed under the MIT/X11 software license, see the accompanying file \nlicense.txt or http://www.opensource.org/licenses/mit-license.php.\n\nThis product includes software developed by the OpenSSL Project for use in the \nOpenSSL Toolkit (http://www.openssl.org/) and cryptographic software written by \nEric Young (e...(line truncated)...
+	m_staticTextMain->Wrap( -1 );
+	bSizer631->Add( m_staticTextMain, 0, wxALL, 5 );
+	
+	
+	bSizer63->Add( 0, 0, 1, wxEXPAND, 5 );
+	bSizer631->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	bSizer62->Add( bSizer63, 1, wxEXPAND, 5 );
+	bSizer62->Add( bSizer631, 1, wxEXPAND, 5 );
+	
+	bSizer60->Add( bSizer62, 1, wxEXPAND, 5 );
+	
+@@ -617,9 +541,11 @@ CAboutDialogBase::CAboutDialogBase( wxWindow* parent, wxWindowID id, const wxStr
+	m_buttonOK = new wxButton( this, wxID_OK, wxT("OK"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	bSizer61->Add( m_buttonOK, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	
+	bSizer60->Add( bSizer61, 0, wxALIGN_RIGHT|wxEXPAND, 5 );
+	bSizer60->Add( bSizer61, 0, wxALIGN_RIGHT|wxEXPAND|wxRIGHT, 5 );
+	
+	bSizer63->Add( bSizer60, 1, wxEXPAND|wxLEFT, 5 );
+	
+	this->SetSizer( bSizer60 );
+	this->SetSizer( bSizer63 );
+	this->Layout();
+	
+	// Connect Events
+  @@ -1,7 +1,6 @@
+// Copyright (c) 2009-2010 Satoshi Nakamoto
+// Distributed under the MIT/X11 software license, see the accompanying
+// file license.txt or http://www.opensource.org/licenses/mit-license.php.
+
+///////////////////////////////////////////////////////////////////////////
+// C++ code generated with wxFormBuilder (version Apr 16 2008)
+// http://www.wxformbuilder.org/
+@@ -30,7 +29,6 @@
+#include <wx/panel.h>
+#include <wx/choice.h>
+#include <wx/listctrl.h>
+#include <wx/notebook.h>
+#include <wx/frame.h>
+#include <wx/html/htmlwin.h>
+#include <wx/dialog.h>
+@@ -119,12 +117,6 @@ class CMainFrameBase : public wxFrame
+		wxStaticText* m_staticTextBalance;
+		
+		wxChoice* m_choiceFilter;
+		wxNotebook* m_notebook;
+		wxPanel* m_panel7;
+		wxPanel* m_panel9;
+		wxPanel* m_panel8;
+		wxPanel* m_panel10;
+		wxPanel* m_panel11;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ){ event.Skip(); }
+@@ -148,21 +140,14 @@ class CMainFrameBase : public wxFrame
+		virtual void OnButtonCopy( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnButtonChange( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnListColBeginDrag( wxListEvent& event ){ event.Skip(); }
+		virtual void OnListItemActivatedAllTransactions( wxListEvent& event ){ event.Skip(); }
+		virtual void OnListItemActivated( wxListEvent& event ){ event.Skip(); }
+		virtual void OnPaintListCtrl( wxPaintEvent& event ){ event.Skip(); }
+		virtual void OnListItemActivatedOrdersSent( wxListEvent& event ){ event.Skip(); }
+		virtual void OnListItemActivatedProductsSent( wxListEvent& event ){ event.Skip(); }
+		virtual void OnListItemActivatedOrdersReceived( wxListEvent& event ){ event.Skip(); }
+		
+	
+	public:
+		wxMenu* m_menuOptions;
+		wxListCtrl* m_listCtrl;
+		wxListCtrl* m_listCtrlEscrows;
+		wxListCtrl* m_listCtrlOrdersSent;
+		wxListCtrl* m_listCtrlProductsSent;
+		wxListCtrl* m_listCtrlOrdersReceived;
+		CMainFrameBase( wxWindow* parent, wxWindowID id = wxID_MAINFRAME, const wxString& title = wxT("Bitcoin"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 727,484 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		CMainFrameBase( wxWindow* parent, wxWindowID id = wxID_MAINFRAME, const wxString& title = wxT("Bitcoin"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 712,484 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		~CMainFrameBase();
+	
+};
+@@ -251,7 +236,7 @@ class CAboutDialogBase : public wxDialog
+	private:
+	
+	protected:
+		
+		wxStaticBitmap* m_bitmap;
+		
+		wxStaticText* m_staticText40;
+		
+@@ -266,7 +251,7 @@ class CAboutDialogBase : public wxDialog
+	
+	public:
+		wxStaticText* m_staticTextVersion;
+		CAboutDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("About Bitcoin"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 507,298 ), long style = wxDEFAULT_DIALOG_STYLE );
+		CAboutDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("About Bitcoin"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 532,329 ), long style = wxDEFAULT_DIALOG_STYLE );
+		~CAboutDialogBase();
+	
+};@@ -0,0 +1,665 @@
+// Copyright (c) 2009-2010 Satoshi Nakamoto
+// Distributed under the MIT/X11 software license, see the accompanying
+// file license.txt or http://www.opensource.org/licenses/mit-license.php.
+/* XPM */
+static const char * about_xpm[] = {
+/* columns rows colors chars-per-pixel */
+"96 564 92 1",
+"  c #001269",
+". c #000C72",
+"X c #00057F",
+"o c #001175",
+"O c #000B6A",
+"+ c #000E84",
+"@ c #000489",
+"# c #001583",
+"$ c #001B89",
+"% c #001B99",
+"& c #000B92",
+"* c #00208B",
+"= c #002B97",
+"- c #0004A6",
+"; c #001DA7",
+": c #0014BC",
+"> c #0019BB",
+", c #0017B4",
+"< c #0023A3",
+"1 c #002CAA",
+"2 c #0030A4",
+"3 c #003BA3",
+"4 c #0033AB",
+"5 c #003FA8",
+"6 c #0027B8",
+"7 c #0035BB",
+"8 c #003CBA",
+"9 c #004ABD",
+"0 c #001DC4",
+"q c #0017CC",
+"w c #000CD0",
+"e c #0026C7",
+"r c #0035C4",
+"t c #003DC5",
+"y c #0032CB",
+"u c #003BCC",
+"i c #002BD3",
+"p c #0021DC",
+"a c #0025D5",
+"s c #0034D5",
+"d c #003ADB",
+"f c #0016F6",
+"g c #0008F9",
+"h c #0027E3",
+"j c #003CE9",
+"k c #002BF5",
+"l c #0024F9",
+"z c #0033F4",
+"x c #0035F8",
+"c c #0048CA",
+"v c #0055C5",
+"b c #0059C3",
+"n c #0053CB",
+"m c #005ACC",
+"M c #004FD4",
+"N c #004CDC",
+"B c #0047D0",
+"V c #005BD6",
+"C c #0049E5",
+"Z c #0042EA",
+"A c #0052E4",
+"S c #005CE4",
+"D c #0054EC",
+"F c #005EEB",
+"G c #004AF5",
+"H c #0051F2",
+"J c #005CFA",
+"K c #0058F9",
+"L c #0066E4",
+"P c #006BE3",
+"I c #0064EC",
+"U c #006DEF",
+"Y c #0074EB",
+"T c #0078EC",
+"R c #0073E7",
+"E c #0065F4",
+"W c #006BF5",
+"Q c #006BFB",
+"! c #0066FD",
+"~ c #0073F5",
+"^ c #007CF3",
+"/ c #0075FB",
+"( c #007DFC",
+") c #0084FF",
+"_ c #008AFF",
+"` c #0092FF",
+"' c #339CFF",
+"] c #33A3FF",
+"[ c #33AAFF",
+"{ c #66B5FF",
+"} c #66BBFF",
+"| c #66C0FF",
+/* pixels */
+"kkkkkkkkkkkk<<<<<<<<<<<<DDDDDDDDDDDDvvvvvvvvvvvv////////////))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"kkkkkkkkkkkk<<<<<<<<<<<<DDDDDDDDDDDDvvvvvvvvvvvv////////////))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"kkkkkkkkkkkk<<<<<<<<<<<<DDDDDDDDDDDDvvvvvvvvvvvv////////////))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"kkkkkkkkkkkk<<<<<<<<<<<<DDDDDDDDDDDDvvvvvvvvvvvv////////////))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"kkkkkkkkkkkk<<<<<<<<<<<<DDDDDDDDDDDDvvvvvvvvvvvv////////////))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"kkkkkkkkkkkk<<<<<<<<<<<<DDDDDDDDDDDDvvvvvvvvvvvv////////////))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"kkkkkkkkkkkk<<<<<<<<<<<<DDDDDDDDDDDDvvvvvvvvvvvv////////////))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"kkkkkkkkkkkk<<<<<<<<<<<<DDDDDDDDDDDDvvvvvvvvvvvv////////////))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"kkkkkkkkkkkk<<<<<<<<<<<<DDDDDDDDDDDDvvvvvvvvvvvv////////////))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"kkkkkkkkkkkk<<<<<<<<<<<<DDDDDDDDDDDDvvvvvvvvvvvv////////////))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"kkkkkkkkkkkk<<<<<<<<<<<<DDDDDDDDDDDDvvvvvvvvvvvv////////////))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"kkkkkkkkkkkk<<<<<<<<<<<<DDDDDDDDDDDDvvvvvvvvvvvv////////////))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"XXXXXXXXXXXXrrrrrrrrrrrr777777777777MMMMMMMMMMMM(((((((((((())))))))))))[[[[[[[[[[[[}}}}}}}}}}}}",
+"XXXXXXXXXXXXrrrrrrrrrrrr777777777777MMMMMMMMMMMM(((((((((((())))))))))))[[[[[[[[[[[[}}}}}}}}}}}}",
+"XXXXXXXXXXXXrrrrrrrrrrrr777777777777MMMMMMMMMMMM(((((((((((())))))))))))[[[[[[[[[[[[}}}}}}}}}}}}",
+"XXXXXXXXXXXXrrrrrrrrrrrr777777777777MMMMMMMMMMMM(((((((((((())))))))))))[[[[[[[[[[[[}}}}}}}}}}}}",
+"XXXXXXXXXXXXrrrrrrrrrrrr777777777777MMMMMMMMMMMM(((((((((((())))))))))))[[[[[[[[[[[[}}}}}}}}}}}}",
+"XXXXXXXXXXXXrrrrrrrrrrrr777777777777MMMMMMMMMMMM(((((((((((())))))))))))[[[[[[[[[[[[}}}}}}}}}}}}",
+"XXXXXXXXXXXXrrrrrrrrrrrr777777777777MMMMMMMMMMMM(((((((((((())))))))))))[[[[[[[[[[[[}}}}}}}}}}}}",
+"XXXXXXXXXXXXrrrrrrrrrrrr777777777777MMMMMMMMMMMM(((((((((((())))))))))))[[[[[[[[[[[[}}}}}}}}}}}}",
+"XXXXXXXXXXXXrrrrrrrrrrrr777777777777MMMMMMMMMMMM(((((((((((())))))))))))[[[[[[[[[[[[}}}}}}}}}}}}",
+"XXXXXXXXXXXXrrrrrrrrrrrr777777777777MMMMMMMMMMMM(((((((((((())))))))))))[[[[[[[[[[[[}}}}}}}}}}}}",
+"XXXXXXXXXXXXrrrrrrrrrrrr777777777777MMMMMMMMMMMM(((((((((((())))))))))))[[[[[[[[[[[[}}}}}}}}}}}}",
+"XXXXXXXXXXXXrrrrrrrrrrrr777777777777MMMMMMMMMMMM(((((((((((())))))))))))[[[[[[[[[[[[}}}}}}}}}}}}",
+"llllllllllll;;;;;;;;;;;;NNNNNNNNNNNNSSSSSSSSSSSS~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"llllllllllll;;;;;;;;;;;;NNNNNNNNNNNNSSSSSSSSSSSS~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"llllllllllll;;;;;;;;;;;;NNNNNNNNNNNNSSSSSSSSSSSS~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"llllllllllll;;;;;;;;;;;;NNNNNNNNNNNNSSSSSSSSSSSS~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"llllllllllll;;;;;;;;;;;;NNNNNNNNNNNNSSSSSSSSSSSS~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"llllllllllll;;;;;;;;;;;;NNNNNNNNNNNNSSSSSSSSSSSS~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"llllllllllll;;;;;;;;;;;;NNNNNNNNNNNNSSSSSSSSSSSS~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"llllllllllll;;;;;;;;;;;;NNNNNNNNNNNNSSSSSSSSSSSS~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"llllllllllll;;;;;;;;;;;;NNNNNNNNNNNNSSSSSSSSSSSS~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"llllllllllll;;;;;;;;;;;;NNNNNNNNNNNNSSSSSSSSSSSS~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"llllllllllll;;;;;;;;;;;;NNNNNNNNNNNNSSSSSSSSSSSS~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"llllllllllll;;;;;;;;;;;;NNNNNNNNNNNNSSSSSSSSSSSS~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"############666666666666uuuuuuuuuuuuJJJJJJJJJJJJ^^^^^^^^^^^^____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"############666666666666uuuuuuuuuuuuJJJJJJJJJJJJ^^^^^^^^^^^^____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"############666666666666uuuuuuuuuuuuJJJJJJJJJJJJ^^^^^^^^^^^^____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"############666666666666uuuuuuuuuuuuJJJJJJJJJJJJ^^^^^^^^^^^^____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"############666666666666uuuuuuuuuuuuJJJJJJJJJJJJ^^^^^^^^^^^^____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"############666666666666uuuuuuuuuuuuJJJJJJJJJJJJ^^^^^^^^^^^^____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"############666666666666uuuuuuuuuuuuJJJJJJJJJJJJ^^^^^^^^^^^^____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"############666666666666uuuuuuuuuuuuJJJJJJJJJJJJ^^^^^^^^^^^^____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"############666666666666uuuuuuuuuuuuJJJJJJJJJJJJ^^^^^^^^^^^^____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"############666666666666uuuuuuuuuuuuJJJJJJJJJJJJ^^^^^^^^^^^^____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"############666666666666uuuuuuuuuuuuJJJJJJJJJJJJ^^^^^^^^^^^^____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"############666666666666uuuuuuuuuuuuJJJJJJJJJJJJ^^^^^^^^^^^^____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"............yyyyyyyyyyyy333333333333AAAAAAAAAAAAWWWWWWWWWWWW____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"............yyyyyyyyyyyy333333333333AAAAAAAAAAAAWWWWWWWWWWWW____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"............yyyyyyyyyyyy333333333333AAAAAAAAAAAAWWWWWWWWWWWW____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"............yyyyyyyyyyyy333333333333AAAAAAAAAAAAWWWWWWWWWWWW____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"............yyyyyyyyyyyy333333333333AAAAAAAAAAAAWWWWWWWWWWWW____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"............yyyyyyyyyyyy333333333333AAAAAAAAAAAAWWWWWWWWWWWW____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"............yyyyyyyyyyyy333333333333AAAAAAAAAAAAWWWWWWWWWWWW____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"............yyyyyyyyyyyy333333333333AAAAAAAAAAAAWWWWWWWWWWWW____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"............yyyyyyyyyyyy333333333333AAAAAAAAAAAAWWWWWWWWWWWW____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"............yyyyyyyyyyyy333333333333AAAAAAAAAAAAWWWWWWWWWWWW____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"............yyyyyyyyyyyy333333333333AAAAAAAAAAAAWWWWWWWWWWWW____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"............yyyyyyyyyyyy333333333333AAAAAAAAAAAAWWWWWWWWWWWW____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"ffffffffffff============yyyyyyyyyyyyJJJJJJJJJJJJRRRRRRRRRRRR))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff============yyyyyyyyyyyyJJJJJJJJJJJJRRRRRRRRRRRR))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff============yyyyyyyyyyyyJJJJJJJJJJJJRRRRRRRRRRRR))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff============yyyyyyyyyyyyJJJJJJJJJJJJRRRRRRRRRRRR))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff============yyyyyyyyyyyyJJJJJJJJJJJJRRRRRRRRRRRR))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff============yyyyyyyyyyyyJJJJJJJJJJJJRRRRRRRRRRRR))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff============yyyyyyyyyyyyJJJJJJJJJJJJRRRRRRRRRRRR))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff============yyyyyyyyyyyyJJJJJJJJJJJJRRRRRRRRRRRR))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff============yyyyyyyyyyyyJJJJJJJJJJJJRRRRRRRRRRRR))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff============yyyyyyyyyyyyJJJJJJJJJJJJRRRRRRRRRRRR))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff============yyyyyyyyyyyyJJJJJJJJJJJJRRRRRRRRRRRR))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff============yyyyyyyyyyyyJJJJJJJJJJJJRRRRRRRRRRRR))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"gggggggggggg$$$$$$$$$$$$uuuuuuuuuuuuNNNNNNNNNNNN~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"gggggggggggg$$$$$$$$$$$$uuuuuuuuuuuuNNNNNNNNNNNN~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"gggggggggggg$$$$$$$$$$$$uuuuuuuuuuuuNNNNNNNNNNNN~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"gggggggggggg$$$$$$$$$$$$uuuuuuuuuuuuNNNNNNNNNNNN~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"gggggggggggg$$$$$$$$$$$$uuuuuuuuuuuuNNNNNNNNNNNN~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"gggggggggggg$$$$$$$$$$$$uuuuuuuuuuuuNNNNNNNNNNNN~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"gggggggggggg$$$$$$$$$$$$uuuuuuuuuuuuNNNNNNNNNNNN~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"gggggggggggg$$$$$$$$$$$$uuuuuuuuuuuuNNNNNNNNNNNN~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"gggggggggggg$$$$$$$$$$$$uuuuuuuuuuuuNNNNNNNNNNNN~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"gggggggggggg$$$$$$$$$$$$uuuuuuuuuuuuNNNNNNNNNNNN~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"gggggggggggg$$$$$$$$$$$$uuuuuuuuuuuuNNNNNNNNNNNN~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"gggggggggggg$$$$$$$$$$$$uuuuuuuuuuuuNNNNNNNNNNNN~~~~~~~~~~~~))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"::::::::::::hhhhhhhhhhhhddddddddddddAAAAAAAAAAAAUUUUUUUUUUUU))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::hhhhhhhhhhhhddddddddddddAAAAAAAAAAAAUUUUUUUUUUUU))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::hhhhhhhhhhhhddddddddddddAAAAAAAAAAAAUUUUUUUUUUUU))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::hhhhhhhhhhhhddddddddddddAAAAAAAAAAAAUUUUUUUUUUUU))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::hhhhhhhhhhhhddddddddddddAAAAAAAAAAAAUUUUUUUUUUUU))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::hhhhhhhhhhhhddddddddddddAAAAAAAAAAAAUUUUUUUUUUUU))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::hhhhhhhhhhhhddddddddddddAAAAAAAAAAAAUUUUUUUUUUUU))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::hhhhhhhhhhhhddddddddddddAAAAAAAAAAAAUUUUUUUUUUUU))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::hhhhhhhhhhhhddddddddddddAAAAAAAAAAAAUUUUUUUUUUUU))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::hhhhhhhhhhhhddddddddddddAAAAAAAAAAAAUUUUUUUUUUUU))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::hhhhhhhhhhhhddddddddddddAAAAAAAAAAAAUUUUUUUUUUUU))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::hhhhhhhhhhhhddddddddddddAAAAAAAAAAAAUUUUUUUUUUUU))))))))))))''''''''''''}}}}}}}}}}}}",
+"zzzzzzzzzzzzGGGGGGGGGGGGBBBBBBBBBBBBDDDDDDDDDDDDPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"zzzzzzzzzzzzGGGGGGGGGGGGBBBBBBBBBBBBDDDDDDDDDDDDPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"zzzzzzzzzzzzGGGGGGGGGGGGBBBBBBBBBBBBDDDDDDDDDDDDPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"zzzzzzzzzzzzGGGGGGGGGGGGBBBBBBBBBBBBDDDDDDDDDDDDPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"zzzzzzzzzzzzGGGGGGGGGGGGBBBBBBBBBBBBDDDDDDDDDDDDPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"zzzzzzzzzzzzGGGGGGGGGGGGBBBBBBBBBBBBDDDDDDDDDDDDPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"zzzzzzzzzzzzGGGGGGGGGGGGBBBBBBBBBBBBDDDDDDDDDDDDPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"zzzzzzzzzzzzGGGGGGGGGGGGBBBBBBBBBBBBDDDDDDDDDDDDPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"zzzzzzzzzzzzGGGGGGGGGGGGBBBBBBBBBBBBDDDDDDDDDDDDPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"zzzzzzzzzzzzGGGGGGGGGGGGBBBBBBBBBBBBDDDDDDDDDDDDPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"zzzzzzzzzzzzGGGGGGGGGGGGBBBBBBBBBBBBDDDDDDDDDDDDPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"zzzzzzzzzzzzGGGGGGGGGGGGBBBBBBBBBBBBDDDDDDDDDDDDPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"ffffffffffffssssssssssssjjjjjjjjjjjjnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+"ffffffffffffssssssssssssjjjjjjjjjjjjnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+"ffffffffffffssssssssssssjjjjjjjjjjjjnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+"ffffffffffffssssssssssssjjjjjjjjjjjjnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+"ffffffffffffssssssssssssjjjjjjjjjjjjnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+"ffffffffffffssssssssssssjjjjjjjjjjjjnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+"ffffffffffffssssssssssssjjjjjjjjjjjjnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+"ffffffffffffssssssssssssjjjjjjjjjjjjnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+"ffffffffffffssssssssssssjjjjjjjjjjjjnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+"ffffffffffffssssssssssssjjjjjjjjjjjjnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+"ffffffffffffssssssssssssjjjjjjjjjjjjnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+"ffffffffffffssssssssssssjjjjjjjjjjjjnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+"wwwwwwwwwwww<<<<<<<<<<<<888888888888VVVVVVVVVVVV~~~~~~~~~~~~((((((((((((]]]]]]]]]]]]}}}}}}}}}}}}",
+"wwwwwwwwwwww<<<<<<<<<<<<888888888888VVVVVVVVVVVV~~~~~~~~~~~~((((((((((((]]]]]]]]]]]]}}}}}}}}}}}}",
+"wwwwwwwwwwww<<<<<<<<<<<<888888888888VVVVVVVVVVVV~~~~~~~~~~~~((((((((((((]]]]]]]]]]]]}}}}}}}}}}}}",
+"wwwwwwwwwwww<<<<<<<<<<<<888888888888VVVVVVVVVVVV~~~~~~~~~~~~((((((((((((]]]]]]]]]]]]}}}}}}}}}}}}",
+"wwwwwwwwwwww<<<<<<<<<<<<888888888888VVVVVVVVVVVV~~~~~~~~~~~~((((((((((((]]]]]]]]]]]]}}}}}}}}}}}}",
+"wwwwwwwwwwww<<<<<<<<<<<<888888888888VVVVVVVVVVVV~~~~~~~~~~~~((((((((((((]]]]]]]]]]]]}}}}}}}}}}}}",
+"wwwwwwwwwwww<<<<<<<<<<<<888888888888VVVVVVVVVVVV~~~~~~~~~~~~((((((((((((]]]]]]]]]]]]}}}}}}}}}}}}",
+"wwwwwwwwwwww<<<<<<<<<<<<888888888888VVVVVVVVVVVV~~~~~~~~~~~~((((((((((((]]]]]]]]]]]]}}}}}}}}}}}}",
+"wwwwwwwwwwww<<<<<<<<<<<<888888888888VVVVVVVVVVVV~~~~~~~~~~~~((((((((((((]]]]]]]]]]]]}}}}}}}}}}}}",
+"wwwwwwwwwwww<<<<<<<<<<<<888888888888VVVVVVVVVVVV~~~~~~~~~~~~((((((((((((]]]]]]]]]]]]}}}}}}}}}}}}",
+"wwwwwwwwwwww<<<<<<<<<<<<888888888888VVVVVVVVVVVV~~~~~~~~~~~~((((((((((((]]]]]]]]]]]]}}}}}}}}}}}}",
+"wwwwwwwwwwww<<<<<<<<<<<<888888888888VVVVVVVVVVVV~~~~~~~~~~~~((((((((((((]]]]]]]]]]]]}}}}}}}}}}}}",
+"hhhhhhhhhhhh>>>>>>>>>>>>rrrrrrrrrrrrVVVVVVVVVVVVLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"hhhhhhhhhhhh>>>>>>>>>>>>rrrrrrrrrrrrVVVVVVVVVVVVLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"hhhhhhhhhhhh>>>>>>>>>>>>rrrrrrrrrrrrVVVVVVVVVVVVLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"hhhhhhhhhhhh>>>>>>>>>>>>rrrrrrrrrrrrVVVVVVVVVVVVLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"hhhhhhhhhhhh>>>>>>>>>>>>rrrrrrrrrrrrVVVVVVVVVVVVLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"hhhhhhhhhhhh>>>>>>>>>>>>rrrrrrrrrrrrVVVVVVVVVVVVLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"hhhhhhhhhhhh>>>>>>>>>>>>rrrrrrrrrrrrVVVVVVVVVVVVLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"hhhhhhhhhhhh>>>>>>>>>>>>rrrrrrrrrrrrVVVVVVVVVVVVLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"hhhhhhhhhhhh>>>>>>>>>>>>rrrrrrrrrrrrVVVVVVVVVVVVLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"hhhhhhhhhhhh>>>>>>>>>>>>rrrrrrrrrrrrVVVVVVVVVVVVLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"hhhhhhhhhhhh>>>>>>>>>>>>rrrrrrrrrrrrVVVVVVVVVVVVLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"hhhhhhhhhhhh>>>>>>>>>>>>rrrrrrrrrrrrVVVVVVVVVVVVLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"::::::::::::;;;;;;;;;;;;HHHHHHHHHHHHccccccccccccQQQQQQQQQQQQ))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::;;;;;;;;;;;;HHHHHHHHHHHHccccccccccccQQQQQQQQQQQQ))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::;;;;;;;;;;;;HHHHHHHHHHHHccccccccccccQQQQQQQQQQQQ))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::;;;;;;;;;;;;HHHHHHHHHHHHccccccccccccQQQQQQQQQQQQ))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::;;;;;;;;;;;;HHHHHHHHHHHHccccccccccccQQQQQQQQQQQQ))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::;;;;;;;;;;;;HHHHHHHHHHHHccccccccccccQQQQQQQQQQQQ))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::;;;;;;;;;;;;HHHHHHHHHHHHccccccccccccQQQQQQQQQQQQ))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::;;;;;;;;;;;;HHHHHHHHHHHHccccccccccccQQQQQQQQQQQQ))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::;;;;;;;;;;;;HHHHHHHHHHHHccccccccccccQQQQQQQQQQQQ))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::;;;;;;;;;;;;HHHHHHHHHHHHccccccccccccQQQQQQQQQQQQ))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::;;;;;;;;;;;;HHHHHHHHHHHHccccccccccccQQQQQQQQQQQQ))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::;;;;;;;;;;;;HHHHHHHHHHHHccccccccccccQQQQQQQQQQQQ))))))))))))''''''''''''}}}}}}}}}}}}",
+"qqqqqqqqqqqqkkkkkkkkkkkk333333333333AAAAAAAAAAAARRRRRRRRRRRR))))))))))))''''''''''''{{{{{{{{{{{{",
+"qqqqqqqqqqqqkkkkkkkkkkkk333333333333AAAAAAAAAAAARRRRRRRRRRRR))))))))))))''''''''''''{{{{{{{{{{{{",
+"qqqqqqqqqqqqkkkkkkkkkkkk333333333333AAAAAAAAAAAARRRRRRRRRRRR))))))))))))''''''''''''{{{{{{{{{{{{",
+"qqqqqqqqqqqqkkkkkkkkkkkk333333333333AAAAAAAAAAAARRRRRRRRRRRR))))))))))))''''''''''''{{{{{{{{{{{{",
+"qqqqqqqqqqqqkkkkkkkkkkkk333333333333AAAAAAAAAAAARRRRRRRRRRRR))))))))))))''''''''''''{{{{{{{{{{{{",
+"qqqqqqqqqqqqkkkkkkkkkkkk333333333333AAAAAAAAAAAARRRRRRRRRRRR))))))))))))''''''''''''{{{{{{{{{{{{",
+"qqqqqqqqqqqqkkkkkkkkkkkk333333333333AAAAAAAAAAAARRRRRRRRRRRR))))))))))))''''''''''''{{{{{{{{{{{{",
+"qqqqqqqqqqqqkkkkkkkkkkkk333333333333AAAAAAAAAAAARRRRRRRRRRRR))))))))))))''''''''''''{{{{{{{{{{{{",
+"qqqqqqqqqqqqkkkkkkkkkkkk333333333333AAAAAAAAAAAARRRRRRRRRRRR))))))))))))''''''''''''{{{{{{{{{{{{",
+"qqqqqqqqqqqqkkkkkkkkkkkk333333333333AAAAAAAAAAAARRRRRRRRRRRR))))))))))))''''''''''''{{{{{{{{{{{{",
+"qqqqqqqqqqqqkkkkkkkkkkkk333333333333AAAAAAAAAAAARRRRRRRRRRRR))))))))))))''''''''''''{{{{{{{{{{{{",
+"qqqqqqqqqqqqkkkkkkkkkkkk333333333333AAAAAAAAAAAARRRRRRRRRRRR))))))))))))''''''''''''{{{{{{{{{{{{",
+"############ppppppppppppssssssssssssIIIIIIIIIIII^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"############ppppppppppppssssssssssssIIIIIIIIIIII^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"############ppppppppppppssssssssssssIIIIIIIIIIII^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"############ppppppppppppssssssssssssIIIIIIIIIIII^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"############ppppppppppppssssssssssssIIIIIIIIIIII^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"############ppppppppppppssssssssssssIIIIIIIIIIII^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"############ppppppppppppssssssssssssIIIIIIIIIIII^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"############ppppppppppppssssssssssssIIIIIIIIIIII^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"############ppppppppppppssssssssssssIIIIIIIIIIII^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"############ppppppppppppssssssssssssIIIIIIIIIIII^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"############ppppppppppppssssssssssssIIIIIIIIIIII^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"############ppppppppppppssssssssssssIIIIIIIIIIII^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"++++++++++++rrrrrrrrrrrr777777777777MMMMMMMMMMMMIIIIIIIIIIII````````````''''''''''''{{{{{{{{{{{{",
+"++++++++++++rrrrrrrrrrrr777777777777MMMMMMMMMMMMIIIIIIIIIIII````````````''''''''''''{{{{{{{{{{{{",
+"++++++++++++rrrrrrrrrrrr777777777777MMMMMMMMMMMMIIIIIIIIIIII````````````''''''''''''{{{{{{{{{{{{",
+"++++++++++++rrrrrrrrrrrr777777777777MMMMMMMMMMMMIIIIIIIIIIII````````````''''''''''''{{{{{{{{{{{{",
+"++++++++++++rrrrrrrrrrrr777777777777MMMMMMMMMMMMIIIIIIIIIIII````````````''''''''''''{{{{{{{{{{{{",
+"++++++++++++rrrrrrrrrrrr777777777777MMMMMMMMMMMMIIIIIIIIIIII````````````''''''''''''{{{{{{{{{{{{",
+"++++++++++++rrrrrrrrrrrr777777777777MMMMMMMMMMMMIIIIIIIIIIII````````````''''''''''''{{{{{{{{{{{{",
+"++++++++++++rrrrrrrrrrrr777777777777MMMMMMMMMMMMIIIIIIIIIIII````````````''''''''''''{{{{{{{{{{{{",
+"++++++++++++rrrrrrrrrrrr777777777777MMMMMMMMMMMMIIIIIIIIIIII````````````''''''''''''{{{{{{{{{{{{",
+"++++++++++++rrrrrrrrrrrr777777777777MMMMMMMMMMMMIIIIIIIIIIII````````````''''''''''''{{{{{{{{{{{{",
+"++++++++++++rrrrrrrrrrrr777777777777MMMMMMMMMMMMIIIIIIIIIIII````````````''''''''''''{{{{{{{{{{{{",
+"++++++++++++rrrrrrrrrrrr777777777777MMMMMMMMMMMMIIIIIIIIIIII````````````''''''''''''{{{{{{{{{{{{",
+"------------$$$$$$$$$$$$999999999999JJJJJJJJJJJJTTTTTTTTTTTT____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"------------$$$$$$$$$$$$999999999999JJJJJJJJJJJJTTTTTTTTTTTT____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"------------$$$$$$$$$$$$999999999999JJJJJJJJJJJJTTTTTTTTTTTT____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"------------$$$$$$$$$$$$999999999999JJJJJJJJJJJJTTTTTTTTTTTT____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"------------$$$$$$$$$$$$999999999999JJJJJJJJJJJJTTTTTTTTTTTT____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"------------$$$$$$$$$$$$999999999999JJJJJJJJJJJJTTTTTTTTTTTT____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"------------$$$$$$$$$$$$999999999999JJJJJJJJJJJJTTTTTTTTTTTT____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"------------$$$$$$$$$$$$999999999999JJJJJJJJJJJJTTTTTTTTTTTT____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"------------$$$$$$$$$$$$999999999999JJJJJJJJJJJJTTTTTTTTTTTT____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"------------$$$$$$$$$$$$999999999999JJJJJJJJJJJJTTTTTTTTTTTT____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"------------$$$$$$$$$$$$999999999999JJJJJJJJJJJJTTTTTTTTTTTT____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"------------$$$$$$$$$$$$999999999999JJJJJJJJJJJJTTTTTTTTTTTT____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"@@@@@@@@@@@@666666666666ttttttttttttWWWWWWWWWWWWPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@666666666666ttttttttttttWWWWWWWWWWWWPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@666666666666ttttttttttttWWWWWWWWWWWWPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@666666666666ttttttttttttWWWWWWWWWWWWPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@666666666666ttttttttttttWWWWWWWWWWWWPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@666666666666ttttttttttttWWWWWWWWWWWWPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@666666666666ttttttttttttWWWWWWWWWWWWPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@666666666666ttttttttttttWWWWWWWWWWWWPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@666666666666ttttttttttttWWWWWWWWWWWWPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@666666666666ttttttttttttWWWWWWWWWWWWPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@666666666666ttttttttttttWWWWWWWWWWWWPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@666666666666ttttttttttttWWWWWWWWWWWWPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaazzzzzzzzzzzzBBBBBBBBBBBBbbbbbbbbbbbbPPPPPPPPPPPP____________''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaazzzzzzzzzzzzBBBBBBBBBBBBbbbbbbbbbbbbPPPPPPPPPPPP____________''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaazzzzzzzzzzzzBBBBBBBBBBBBbbbbbbbbbbbbPPPPPPPPPPPP____________''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaazzzzzzzzzzzzBBBBBBBBBBBBbbbbbbbbbbbbPPPPPPPPPPPP____________''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaazzzzzzzzzzzzBBBBBBBBBBBBbbbbbbbbbbbbPPPPPPPPPPPP____________''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaazzzzzzzzzzzzBBBBBBBBBBBBbbbbbbbbbbbbPPPPPPPPPPPP____________''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaazzzzzzzzzzzzBBBBBBBBBBBBbbbbbbbbbbbbPPPPPPPPPPPP____________''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaazzzzzzzzzzzzBBBBBBBBBBBBbbbbbbbbbbbbPPPPPPPPPPPP____________''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaazzzzzzzzzzzzBBBBBBBBBBBBbbbbbbbbbbbbPPPPPPPPPPPP____________''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaazzzzzzzzzzzzBBBBBBBBBBBBbbbbbbbbbbbbPPPPPPPPPPPP____________''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaazzzzzzzzzzzzBBBBBBBBBBBBbbbbbbbbbbbbPPPPPPPPPPPP____________''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaazzzzzzzzzzzzBBBBBBBBBBBBbbbbbbbbbbbbPPPPPPPPPPPP____________''''''''''''{{{{{{{{{{{{",
+"------------%%%%%%%%%%%%ttttttttttttNNNNNNNNNNNN^^^^^^^^^^^^))))))))))))''''''''''''}}}}}}}}}}}}",
+"------------%%%%%%%%%%%%ttttttttttttNNNNNNNNNNNN^^^^^^^^^^^^))))))))))))''''''''''''}}}}}}}}}}}}",
+"------------%%%%%%%%%%%%ttttttttttttNNNNNNNNNNNN^^^^^^^^^^^^))))))))))))''''''''''''}}}}}}}}}}}}",
+"------------%%%%%%%%%%%%ttttttttttttNNNNNNNNNNNN^^^^^^^^^^^^))))))))))))''''''''''''}}}}}}}}}}}}",
+"------------%%%%%%%%%%%%ttttttttttttNNNNNNNNNNNN^^^^^^^^^^^^))))))))))))''''''''''''}}}}}}}}}}}}",
+"------------%%%%%%%%%%%%ttttttttttttNNNNNNNNNNNN^^^^^^^^^^^^))))))))))))''''''''''''}}}}}}}}}}}}",
+"------------%%%%%%%%%%%%ttttttttttttNNNNNNNNNNNN^^^^^^^^^^^^))))))))))))''''''''''''}}}}}}}}}}}}",
+"------------%%%%%%%%%%%%ttttttttttttNNNNNNNNNNNN^^^^^^^^^^^^))))))))))))''''''''''''}}}}}}}}}}}}",
+"------------%%%%%%%%%%%%ttttttttttttNNNNNNNNNNNN^^^^^^^^^^^^))))))))))))''''''''''''}}}}}}}}}}}}",
+"------------%%%%%%%%%%%%ttttttttttttNNNNNNNNNNNN^^^^^^^^^^^^))))))))))))''''''''''''}}}}}}}}}}}}",
+"------------%%%%%%%%%%%%ttttttttttttNNNNNNNNNNNN^^^^^^^^^^^^))))))))))))''''''''''''}}}}}}}}}}}}",
+"------------%%%%%%%%%%%%ttttttttttttNNNNNNNNNNNN^^^^^^^^^^^^))))))))))))''''''''''''}}}}}}}}}}}}",
+"            000000000000888888888888FFFFFFFFFFFF~~~~~~~~~~~~))))))))))))''''''''''''}}}}}}}}}}}}",
+"            000000000000888888888888FFFFFFFFFFFF~~~~~~~~~~~~))))))))))))''''''''''''}}}}}}}}}}}}",
+"            000000000000888888888888FFFFFFFFFFFF~~~~~~~~~~~~))))))))))))''''''''''''}}}}}}}}}}}}",
+"            000000000000888888888888FFFFFFFFFFFF~~~~~~~~~~~~))))))))))))''''''''''''}}}}}}}}}}}}",
+"            000000000000888888888888FFFFFFFFFFFF~~~~~~~~~~~~))))))))))))''''''''''''}}}}}}}}}}}}",
+"            000000000000888888888888FFFFFFFFFFFF~~~~~~~~~~~~))))))))))))''''''''''''}}}}}}}}}}}}",
+"            000000000000888888888888FFFFFFFFFFFF~~~~~~~~~~~~))))))))))))''''''''''''}}}}}}}}}}}}",
+"            000000000000888888888888FFFFFFFFFFFF~~~~~~~~~~~~))))))))))))''''''''''''}}}}}}}}}}}}",
+"            000000000000888888888888FFFFFFFFFFFF~~~~~~~~~~~~))))))))))))''''''''''''}}}}}}}}}}}}",
+"            000000000000888888888888FFFFFFFFFFFF~~~~~~~~~~~~))))))))))))''''''''''''}}}}}}}}}}}}",
+"            000000000000888888888888FFFFFFFFFFFF~~~~~~~~~~~~))))))))))))''''''''''''}}}}}}}}}}}}",
+"            000000000000888888888888FFFFFFFFFFFF~~~~~~~~~~~~))))))))))))''''''''''''}}}}}}}}}}}}",
+"++++++++++++222222222222xxxxxxxxxxxxNNNNNNNNNNNNEEEEEEEEEEEE))))))))))))''''''''''''}}}}}}}}}}}}",
+"++++++++++++222222222222xxxxxxxxxxxxNNNNNNNNNNNNEEEEEEEEEEEE))))))))))))''''''''''''}}}}}}}}}}}}",
+"++++++++++++222222222222xxxxxxxxxxxxNNNNNNNNNNNNEEEEEEEEEEEE))))))))))))''''''''''''}}}}}}}}}}}}",
+"++++++++++++222222222222xxxxxxxxxxxxNNNNNNNNNNNNEEEEEEEEEEEE))))))))))))''''''''''''}}}}}}}}}}}}",
+"++++++++++++222222222222xxxxxxxxxxxxNNNNNNNNNNNNEEEEEEEEEEEE))))))))))))''''''''''''}}}}}}}}}}}}",
+"++++++++++++222222222222xxxxxxxxxxxxNNNNNNNNNNNNEEEEEEEEEEEE))))))))))))''''''''''''}}}}}}}}}}}}",
+"++++++++++++222222222222xxxxxxxxxxxxNNNNNNNNNNNNEEEEEEEEEEEE))))))))))))''''''''''''}}}}}}}}}}}}",
+"++++++++++++222222222222xxxxxxxxxxxxNNNNNNNNNNNNEEEEEEEEEEEE))))))))))))''''''''''''}}}}}}}}}}}}",
+"++++++++++++222222222222xxxxxxxxxxxxNNNNNNNNNNNNEEEEEEEEEEEE))))))))))))''''''''''''}}}}}}}}}}}}",
+"++++++++++++222222222222xxxxxxxxxxxxNNNNNNNNNNNNEEEEEEEEEEEE))))))))))))''''''''''''}}}}}}}}}}}}",
+"++++++++++++222222222222xxxxxxxxxxxxNNNNNNNNNNNNEEEEEEEEEEEE))))))))))))''''''''''''}}}}}}}}}}}}",
+"++++++++++++222222222222xxxxxxxxxxxxNNNNNNNNNNNNEEEEEEEEEEEE))))))))))))''''''''''''}}}}}}}}}}}}",
+"$$$$$$$$$$$$000000000000GGGGGGGGGGGGnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"$$$$$$$$$$$$000000000000GGGGGGGGGGGGnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"$$$$$$$$$$$$000000000000GGGGGGGGGGGGnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"$$$$$$$$$$$$000000000000GGGGGGGGGGGGnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"$$$$$$$$$$$$000000000000GGGGGGGGGGGGnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"$$$$$$$$$$$$000000000000GGGGGGGGGGGGnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"$$$$$$$$$$$$000000000000GGGGGGGGGGGGnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"$$$$$$$$$$$$000000000000GGGGGGGGGGGGnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"$$$$$$$$$$$$000000000000GGGGGGGGGGGGnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"$$$$$$$$$$$$000000000000GGGGGGGGGGGGnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"$$$$$$$$$$$$000000000000GGGGGGGGGGGGnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"$$$$$$$$$$$$000000000000GGGGGGGGGGGGnnnnnnnnnnnnLLLLLLLLLLLL))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ooooooooooooffffffffffffccccccccccccbbbbbbbbbbbbRRRRRRRRRRRR____________''''''''''''{{{{{{{{{{{{",
+"ooooooooooooffffffffffffccccccccccccbbbbbbbbbbbbRRRRRRRRRRRR____________''''''''''''{{{{{{{{{{{{",
+"ooooooooooooffffffffffffccccccccccccbbbbbbbbbbbbRRRRRRRRRRRR____________''''''''''''{{{{{{{{{{{{",
+"ooooooooooooffffffffffffccccccccccccbbbbbbbbbbbbRRRRRRRRRRRR____________''''''''''''{{{{{{{{{{{{",
+"ooooooooooooffffffffffffccccccccccccbbbbbbbbbbbbRRRRRRRRRRRR____________''''''''''''{{{{{{{{{{{{",
+"ooooooooooooffffffffffffccccccccccccbbbbbbbbbbbbRRRRRRRRRRRR____________''''''''''''{{{{{{{{{{{{",
+"ooooooooooooffffffffffffccccccccccccbbbbbbbbbbbbRRRRRRRRRRRR____________''''''''''''{{{{{{{{{{{{",
+"ooooooooooooffffffffffffccccccccccccbbbbbbbbbbbbRRRRRRRRRRRR____________''''''''''''{{{{{{{{{{{{",
+"ooooooooooooffffffffffffccccccccccccbbbbbbbbbbbbRRRRRRRRRRRR____________''''''''''''{{{{{{{{{{{{",
+"ooooooooooooffffffffffffccccccccccccbbbbbbbbbbbbRRRRRRRRRRRR____________''''''''''''{{{{{{{{{{{{",
+"ooooooooooooffffffffffffccccccccccccbbbbbbbbbbbbRRRRRRRRRRRR____________''''''''''''{{{{{{{{{{{{",
+"ooooooooooooffffffffffffccccccccccccbbbbbbbbbbbbRRRRRRRRRRRR____________''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@111111111111777777777777JJJJJJJJJJJJPPPPPPPPPPPP((((((((((((''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@111111111111777777777777JJJJJJJJJJJJPPPPPPPPPPPP((((((((((((''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@111111111111777777777777JJJJJJJJJJJJPPPPPPPPPPPP((((((((((((''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@111111111111777777777777JJJJJJJJJJJJPPPPPPPPPPPP((((((((((((''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@111111111111777777777777JJJJJJJJJJJJPPPPPPPPPPPP((((((((((((''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@111111111111777777777777JJJJJJJJJJJJPPPPPPPPPPPP((((((((((((''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@111111111111777777777777JJJJJJJJJJJJPPPPPPPPPPPP((((((((((((''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@111111111111777777777777JJJJJJJJJJJJPPPPPPPPPPPP((((((((((((''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@111111111111777777777777JJJJJJJJJJJJPPPPPPPPPPPP((((((((((((''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@111111111111777777777777JJJJJJJJJJJJPPPPPPPPPPPP((((((((((((''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@111111111111777777777777JJJJJJJJJJJJPPPPPPPPPPPP((((((((((((''''''''''''{{{{{{{{{{{{",
+"@@@@@@@@@@@@111111111111777777777777JJJJJJJJJJJJPPPPPPPPPPPP((((((((((((''''''''''''{{{{{{{{{{{{",
+"            iiiiiiiiiiiiGGGGGGGGGGGGVVVVVVVVVVVV~~~~~~~~~~~~____________''''''''''''}}}}}}}}}}}}",
+"            iiiiiiiiiiiiGGGGGGGGGGGGVVVVVVVVVVVV~~~~~~~~~~~~____________''''''''''''}}}}}}}}}}}}",
+"            iiiiiiiiiiiiGGGGGGGGGGGGVVVVVVVVVVVV~~~~~~~~~~~~____________''''''''''''}}}}}}}}}}}}",
+"            iiiiiiiiiiiiGGGGGGGGGGGGVVVVVVVVVVVV~~~~~~~~~~~~____________''''''''''''}}}}}}}}}}}}",
+"            iiiiiiiiiiiiGGGGGGGGGGGGVVVVVVVVVVVV~~~~~~~~~~~~____________''''''''''''}}}}}}}}}}}}",
+"            iiiiiiiiiiiiGGGGGGGGGGGGVVVVVVVVVVVV~~~~~~~~~~~~____________''''''''''''}}}}}}}}}}}}",
+"            iiiiiiiiiiiiGGGGGGGGGGGGVVVVVVVVVVVV~~~~~~~~~~~~____________''''''''''''}}}}}}}}}}}}",
+"            iiiiiiiiiiiiGGGGGGGGGGGGVVVVVVVVVVVV~~~~~~~~~~~~____________''''''''''''}}}}}}}}}}}}",
+"            iiiiiiiiiiiiGGGGGGGGGGGGVVVVVVVVVVVV~~~~~~~~~~~~____________''''''''''''}}}}}}}}}}}}",
+"            iiiiiiiiiiiiGGGGGGGGGGGGVVVVVVVVVVVV~~~~~~~~~~~~____________''''''''''''}}}}}}}}}}}}",
+"            iiiiiiiiiiiiGGGGGGGGGGGGVVVVVVVVVVVV~~~~~~~~~~~~____________''''''''''''}}}}}}}}}}}}",
+"            iiiiiiiiiiiiGGGGGGGGGGGGVVVVVVVVVVVV~~~~~~~~~~~~____________''''''''''''}}}}}}}}}}}}",
+"------------222222222222KKKKKKKKKKKKIIIIIIIIIIIIQQQQQQQQQQQQ____________''''''''''''{{{{{{{{{{{{",
+"------------222222222222KKKKKKKKKKKKIIIIIIIIIIIIQQQQQQQQQQQQ____________''''''''''''{{{{{{{{{{{{",
+"------------222222222222KKKKKKKKKKKKIIIIIIIIIIIIQQQQQQQQQQQQ____________''''''''''''{{{{{{{{{{{{",
+"------------222222222222KKKKKKKKKKKKIIIIIIIIIIIIQQQQQQQQQQQQ____________''''''''''''{{{{{{{{{{{{",
+"------------222222222222KKKKKKKKKKKKIIIIIIIIIIIIQQQQQQQQQQQQ____________''''''''''''{{{{{{{{{{{{",
+"------------222222222222KKKKKKKKKKKKIIIIIIIIIIIIQQQQQQQQQQQQ____________''''''''''''{{{{{{{{{{{{",
+"------------222222222222KKKKKKKKKKKKIIIIIIIIIIIIQQQQQQQQQQQQ____________''''''''''''{{{{{{{{{{{{",
+"------------222222222222KKKKKKKKKKKKIIIIIIIIIIIIQQQQQQQQQQQQ____________''''''''''''{{{{{{{{{{{{",
+"------------222222222222KKKKKKKKKKKKIIIIIIIIIIIIQQQQQQQQQQQQ____________''''''''''''{{{{{{{{{{{{",
+"------------222222222222KKKKKKKKKKKKIIIIIIIIIIIIQQQQQQQQQQQQ____________''''''''''''{{{{{{{{{{{{",
+"------------222222222222KKKKKKKKKKKKIIIIIIIIIIIIQQQQQQQQQQQQ____________''''''''''''{{{{{{{{{{{{",
+"------------222222222222KKKKKKKKKKKKIIIIIIIIIIIIQQQQQQQQQQQQ____________''''''''''''{{{{{{{{{{{{",
+"&&&&&&&&&&&&222222222222333333333333WWWWWWWWWWWW~~~~~~~~~~~~____________''''''''''''{{{{{{{{{{{{",
+"&&&&&&&&&&&&222222222222333333333333WWWWWWWWWWWW~~~~~~~~~~~~____________''''''''''''{{{{{{{{{{{{",
+"&&&&&&&&&&&&222222222222333333333333WWWWWWWWWWWW~~~~~~~~~~~~____________''''''''''''{{{{{{{{{{{{",
+"&&&&&&&&&&&&222222222222333333333333WWWWWWWWWWWW~~~~~~~~~~~~____________''''''''''''{{{{{{{{{{{{",
+"&&&&&&&&&&&&222222222222333333333333WWWWWWWWWWWW~~~~~~~~~~~~____________''''''''''''{{{{{{{{{{{{",
+"&&&&&&&&&&&&222222222222333333333333WWWWWWWWWWWW~~~~~~~~~~~~____________''''''''''''{{{{{{{{{{{{",
+"&&&&&&&&&&&&222222222222333333333333WWWWWWWWWWWW~~~~~~~~~~~~____________''''''''''''{{{{{{{{{{{{",
+"&&&&&&&&&&&&222222222222333333333333WWWWWWWWWWWW~~~~~~~~~~~~____________''''''''''''{{{{{{{{{{{{",
+"&&&&&&&&&&&&222222222222333333333333WWWWWWWWWWWW~~~~~~~~~~~~____________''''''''''''{{{{{{{{{{{{",
+"&&&&&&&&&&&&222222222222333333333333WWWWWWWWWWWW~~~~~~~~~~~~____________''''''''''''{{{{{{{{{{{{",
+"&&&&&&&&&&&&222222222222333333333333WWWWWWWWWWWW~~~~~~~~~~~~____________''''''''''''{{{{{{{{{{{{",
+"&&&&&&&&&&&&222222222222333333333333WWWWWWWWWWWW~~~~~~~~~~~~____________''''''''''''{{{{{{{{{{{{",
+"wwwwwwwwwwww============555555555555EEEEEEEEEEEEEEEEEEEEEEEE____________''''''''''''||||||||||||",
+"wwwwwwwwwwww============555555555555EEEEEEEEEEEEEEEEEEEEEEEE____________''''''''''''||||||||||||",
+"wwwwwwwwwwww============555555555555EEEEEEEEEEEEEEEEEEEEEEEE____________''''''''''''||||||||||||",
+"wwwwwwwwwwww============555555555555EEEEEEEEEEEEEEEEEEEEEEEE____________''''''''''''||||||||||||",
+"wwwwwwwwwwww============555555555555EEEEEEEEEEEEEEEEEEEEEEEE____________''''''''''''||||||||||||",
+"wwwwwwwwwwww============555555555555EEEEEEEEEEEEEEEEEEEEEEEE____________''''''''''''||||||||||||",
+"wwwwwwwwwwww============555555555555EEEEEEEEEEEEEEEEEEEEEEEE____________''''''''''''||||||||||||",
+"wwwwwwwwwwww============555555555555EEEEEEEEEEEEEEEEEEEEEEEE____________''''''''''''||||||||||||",
+"wwwwwwwwwwww============555555555555EEEEEEEEEEEEEEEEEEEEEEEE____________''''''''''''||||||||||||",
+"wwwwwwwwwwww============555555555555EEEEEEEEEEEEEEEEEEEEEEEE____________''''''''''''||||||||||||",
+"wwwwwwwwwwww============555555555555EEEEEEEEEEEEEEEEEEEEEEEE____________''''''''''''||||||||||||",
+"wwwwwwwwwwww============555555555555EEEEEEEEEEEEEEEEEEEEEEEE____________''''''''''''||||||||||||",
+"ffffffffffff>>>>>>>>>>>>rrrrrrrrrrrrnnnnnnnnnnnn~~~~~~~~~~~~____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff>>>>>>>>>>>>rrrrrrrrrrrrnnnnnnnnnnnn~~~~~~~~~~~~____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff>>>>>>>>>>>>rrrrrrrrrrrrnnnnnnnnnnnn~~~~~~~~~~~~____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff>>>>>>>>>>>>rrrrrrrrrrrrnnnnnnnnnnnn~~~~~~~~~~~~____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff>>>>>>>>>>>>rrrrrrrrrrrrnnnnnnnnnnnn~~~~~~~~~~~~____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff>>>>>>>>>>>>rrrrrrrrrrrrnnnnnnnnnnnn~~~~~~~~~~~~____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff>>>>>>>>>>>>rrrrrrrrrrrrnnnnnnnnnnnn~~~~~~~~~~~~____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff>>>>>>>>>>>>rrrrrrrrrrrrnnnnnnnnnnnn~~~~~~~~~~~~____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff>>>>>>>>>>>>rrrrrrrrrrrrnnnnnnnnnnnn~~~~~~~~~~~~____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff>>>>>>>>>>>>rrrrrrrrrrrrnnnnnnnnnnnn~~~~~~~~~~~~____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff>>>>>>>>>>>>rrrrrrrrrrrrnnnnnnnnnnnn~~~~~~~~~~~~____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"ffffffffffff>>>>>>>>>>>>rrrrrrrrrrrrnnnnnnnnnnnn~~~~~~~~~~~~____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"############$$$$$$$$$$$$CCCCCCCCCCCCEEEEEEEEEEEE(((((((((((())))))))))))''''''''''''}}}}}}}}}}}}",
+"############$$$$$$$$$$$$CCCCCCCCCCCCEEEEEEEEEEEE(((((((((((())))))))))))''''''''''''}}}}}}}}}}}}",
+"############$$$$$$$$$$$$CCCCCCCCCCCCEEEEEEEEEEEE(((((((((((())))))))))))''''''''''''}}}}}}}}}}}}",
+"############$$$$$$$$$$$$CCCCCCCCCCCCEEEEEEEEEEEE(((((((((((())))))))))))''''''''''''}}}}}}}}}}}}",
+"############$$$$$$$$$$$$CCCCCCCCCCCCEEEEEEEEEEEE(((((((((((())))))))))))''''''''''''}}}}}}}}}}}}",
+"############$$$$$$$$$$$$CCCCCCCCCCCCEEEEEEEEEEEE(((((((((((())))))))))))''''''''''''}}}}}}}}}}}}",
+"############$$$$$$$$$$$$CCCCCCCCCCCCEEEEEEEEEEEE(((((((((((())))))))))))''''''''''''}}}}}}}}}}}}",
+"############$$$$$$$$$$$$CCCCCCCCCCCCEEEEEEEEEEEE(((((((((((())))))))))))''''''''''''}}}}}}}}}}}}",
+"############$$$$$$$$$$$$CCCCCCCCCCCCEEEEEEEEEEEE(((((((((((())))))))))))''''''''''''}}}}}}}}}}}}",
+"############$$$$$$$$$$$$CCCCCCCCCCCCEEEEEEEEEEEE(((((((((((())))))))))))''''''''''''}}}}}}}}}}}}",
+"############$$$$$$$$$$$$CCCCCCCCCCCCEEEEEEEEEEEE(((((((((((())))))))))))''''''''''''}}}}}}}}}}}}",
+"############$$$$$$$$$$$$CCCCCCCCCCCCEEEEEEEEEEEE(((((((((((())))))))))))''''''''''''}}}}}}}}}}}}",
+",,,,,,,,,,,,666666666666ddddddddddddHHHHHHHHHHHHEEEEEEEEEEEE____________]]]]]]]]]]]]{{{{{{{{{{{{",
+",,,,,,,,,,,,666666666666ddddddddddddHHHHHHHHHHHHEEEEEEEEEEEE____________]]]]]]]]]]]]{{{{{{{{{{{{",
+",,,,,,,,,,,,666666666666ddddddddddddHHHHHHHHHHHHEEEEEEEEEEEE____________]]]]]]]]]]]]{{{{{{{{{{{{",
+",,,,,,,,,,,,666666666666ddddddddddddHHHHHHHHHHHHEEEEEEEEEEEE____________]]]]]]]]]]]]{{{{{{{{{{{{",
+",,,,,,,,,,,,666666666666ddddddddddddHHHHHHHHHHHHEEEEEEEEEEEE____________]]]]]]]]]]]]{{{{{{{{{{{{",
+",,,,,,,,,,,,666666666666ddddddddddddHHHHHHHHHHHHEEEEEEEEEEEE____________]]]]]]]]]]]]{{{{{{{{{{{{",
+",,,,,,,,,,,,666666666666ddddddddddddHHHHHHHHHHHHEEEEEEEEEEEE____________]]]]]]]]]]]]{{{{{{{{{{{{",
+",,,,,,,,,,,,666666666666ddddddddddddHHHHHHHHHHHHEEEEEEEEEEEE____________]]]]]]]]]]]]{{{{{{{{{{{{",
+",,,,,,,,,,,,666666666666ddddddddddddHHHHHHHHHHHHEEEEEEEEEEEE____________]]]]]]]]]]]]{{{{{{{{{{{{",
+",,,,,,,,,,,,666666666666ddddddddddddHHHHHHHHHHHHEEEEEEEEEEEE____________]]]]]]]]]]]]{{{{{{{{{{{{",
+",,,,,,,,,,,,666666666666ddddddddddddHHHHHHHHHHHHEEEEEEEEEEEE____________]]]]]]]]]]]]{{{{{{{{{{{{",
+",,,,,,,,,,,,666666666666ddddddddddddHHHHHHHHHHHHEEEEEEEEEEEE____________]]]]]]]]]]]]{{{{{{{{{{{{",
+"xxxxxxxxxxxxjjjjjjjjjjjjccccccccccccSSSSSSSSSSSSPPPPPPPPPPPP))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"xxxxxxxxxxxxjjjjjjjjjjjjccccccccccccSSSSSSSSSSSSPPPPPPPPPPPP))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"xxxxxxxxxxxxjjjjjjjjjjjjccccccccccccSSSSSSSSSSSSPPPPPPPPPPPP))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"xxxxxxxxxxxxjjjjjjjjjjjjccccccccccccSSSSSSSSSSSSPPPPPPPPPPPP))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"xxxxxxxxxxxxjjjjjjjjjjjjccccccccccccSSSSSSSSSSSSPPPPPPPPPPPP))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"xxxxxxxxxxxxjjjjjjjjjjjjccccccccccccSSSSSSSSSSSSPPPPPPPPPPPP))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"xxxxxxxxxxxxjjjjjjjjjjjjccccccccccccSSSSSSSSSSSSPPPPPPPPPPPP))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"xxxxxxxxxxxxjjjjjjjjjjjjccccccccccccSSSSSSSSSSSSPPPPPPPPPPPP))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"xxxxxxxxxxxxjjjjjjjjjjjjccccccccccccSSSSSSSSSSSSPPPPPPPPPPPP))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"xxxxxxxxxxxxjjjjjjjjjjjjccccccccccccSSSSSSSSSSSSPPPPPPPPPPPP))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"xxxxxxxxxxxxjjjjjjjjjjjjccccccccccccSSSSSSSSSSSSPPPPPPPPPPPP))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"xxxxxxxxxxxxjjjjjjjjjjjjccccccccccccSSSSSSSSSSSSPPPPPPPPPPPP))))))))))))]]]]]]]]]]]]}}}}}}}}}}}}",
+"000000000000%%%%%%%%%%%%ttttttttttttmmmmmmmmmmmm////////////````````````''''''''''''{{{{{{{{{{{{",
+"000000000000%%%%%%%%%%%%ttttttttttttmmmmmmmmmmmm////////////````````````''''''''''''{{{{{{{{{{{{",
+"000000000000%%%%%%%%%%%%ttttttttttttmmmmmmmmmmmm////////////````````````''''''''''''{{{{{{{{{{{{",
+"000000000000%%%%%%%%%%%%ttttttttttttmmmmmmmmmmmm////////////````````````''''''''''''{{{{{{{{{{{{",
+"000000000000%%%%%%%%%%%%ttttttttttttmmmmmmmmmmmm////////////````````````''''''''''''{{{{{{{{{{{{",
+"000000000000%%%%%%%%%%%%ttttttttttttmmmmmmmmmmmm////////////````````````''''''''''''{{{{{{{{{{{{",
+"000000000000%%%%%%%%%%%%ttttttttttttmmmmmmmmmmmm////////////````````````''''''''''''{{{{{{{{{{{{",
+"000000000000%%%%%%%%%%%%ttttttttttttmmmmmmmmmmmm////////////````````````''''''''''''{{{{{{{{{{{{",
+"000000000000%%%%%%%%%%%%ttttttttttttmmmmmmmmmmmm////////////````````````''''''''''''{{{{{{{{{{{{",
+"000000000000%%%%%%%%%%%%ttttttttttttmmmmmmmmmmmm////////////````````````''''''''''''{{{{{{{{{{{{",
+"000000000000%%%%%%%%%%%%ttttttttttttmmmmmmmmmmmm////////////````````````''''''''''''{{{{{{{{{{{{",
+"000000000000%%%%%%%%%%%%ttttttttttttmmmmmmmmmmmm////////////````````````''''''''''''{{{{{{{{{{{{",
+">>>>>>>>>>>>uuuuuuuuuuuuZZZZZZZZZZZZmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+">>>>>>>>>>>>uuuuuuuuuuuuZZZZZZZZZZZZmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+">>>>>>>>>>>>uuuuuuuuuuuuZZZZZZZZZZZZmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+">>>>>>>>>>>>uuuuuuuuuuuuZZZZZZZZZZZZmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+">>>>>>>>>>>>uuuuuuuuuuuuZZZZZZZZZZZZmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+">>>>>>>>>>>>uuuuuuuuuuuuZZZZZZZZZZZZmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+">>>>>>>>>>>>uuuuuuuuuuuuZZZZZZZZZZZZmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+">>>>>>>>>>>>uuuuuuuuuuuuZZZZZZZZZZZZmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+">>>>>>>>>>>>uuuuuuuuuuuuZZZZZZZZZZZZmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+">>>>>>>>>>>>uuuuuuuuuuuuZZZZZZZZZZZZmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+">>>>>>>>>>>>uuuuuuuuuuuuZZZZZZZZZZZZmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+">>>>>>>>>>>>uuuuuuuuuuuuZZZZZZZZZZZZmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''{{{{{{{{{{{{",
+"OOOOOOOOOOOO444444444444888888888888KKKKKKKKKKKKTTTTTTTTTTTT))))))))))))''''''''''''{{{{{{{{{{{{",
+"OOOOOOOOOOOO444444444444888888888888KKKKKKKKKKKKTTTTTTTTTTTT))))))))))))''''''''''''{{{{{{{{{{{{",
+"OOOOOOOOOOOO444444444444888888888888KKKKKKKKKKKKTTTTTTTTTTTT))))))))))))''''''''''''{{{{{{{{{{{{",
+"OOOOOOOOOOOO444444444444888888888888KKKKKKKKKKKKTTTTTTTTTTTT))))))))))))''''''''''''{{{{{{{{{{{{",
+"OOOOOOOOOOOO444444444444888888888888KKKKKKKKKKKKTTTTTTTTTTTT))))))))))))''''''''''''{{{{{{{{{{{{",
+"OOOOOOOOOOOO444444444444888888888888KKKKKKKKKKKKTTTTTTTTTTTT))))))))))))''''''''''''{{{{{{{{{{{{",
+"OOOOOOOOOOOO444444444444888888888888KKKKKKKKKKKKTTTTTTTTTTTT))))))))))))''''''''''''{{{{{{{{{{{{",
+"OOOOOOOOOOOO444444444444888888888888KKKKKKKKKKKKTTTTTTTTTTTT))))))))))))''''''''''''{{{{{{{{{{{{",
+"OOOOOOOOOOOO444444444444888888888888KKKKKKKKKKKKTTTTTTTTTTTT))))))))))))''''''''''''{{{{{{{{{{{{",
+"OOOOOOOOOOOO444444444444888888888888KKKKKKKKKKKKTTTTTTTTTTTT))))))))))))''''''''''''{{{{{{{{{{{{",
+"OOOOOOOOOOOO444444444444888888888888KKKKKKKKKKKKTTTTTTTTTTTT))))))))))))''''''''''''{{{{{{{{{{{{",
+"OOOOOOOOOOOO444444444444888888888888KKKKKKKKKKKKTTTTTTTTTTTT))))))))))))''''''''''''{{{{{{{{{{{{",
+"++++++++++++666666666666CCCCCCCCCCCCQQQQQQQQQQQQYYYYYYYYYYYY____________''''''''''''}}}}}}}}}}}}",
+"++++++++++++666666666666CCCCCCCCCCCCQQQQQQQQQQQQYYYYYYYYYYYY____________''''''''''''}}}}}}}}}}}}",
+"++++++++++++666666666666CCCCCCCCCCCCQQQQQQQQQQQQYYYYYYYYYYYY____________''''''''''''}}}}}}}}}}}}",
+"++++++++++++666666666666CCCCCCCCCCCCQQQQQQQQQQQQYYYYYYYYYYYY____________''''''''''''}}}}}}}}}}}}",
+"++++++++++++666666666666CCCCCCCCCCCCQQQQQQQQQQQQYYYYYYYYYYYY____________''''''''''''}}}}}}}}}}}}",
+"++++++++++++666666666666CCCCCCCCCCCCQQQQQQQQQQQQYYYYYYYYYYYY____________''''''''''''}}}}}}}}}}}}",
+"++++++++++++666666666666CCCCCCCCCCCCQQQQQQQQQQQQYYYYYYYYYYYY____________''''''''''''}}}}}}}}}}}}",
+"++++++++++++666666666666CCCCCCCCCCCCQQQQQQQQQQQQYYYYYYYYYYYY____________''''''''''''}}}}}}}}}}}}",
+"++++++++++++666666666666CCCCCCCCCCCCQQQQQQQQQQQQYYYYYYYYYYYY____________''''''''''''}}}}}}}}}}}}",
+"++++++++++++666666666666CCCCCCCCCCCCQQQQQQQQQQQQYYYYYYYYYYYY____________''''''''''''}}}}}}}}}}}}",
+"++++++++++++666666666666CCCCCCCCCCCCQQQQQQQQQQQQYYYYYYYYYYYY____________''''''''''''}}}}}}}}}}}}",
+"++++++++++++666666666666CCCCCCCCCCCCQQQQQQQQQQQQYYYYYYYYYYYY____________''''''''''''}}}}}}}}}}}}",
+"oooooooooooo,,,,,,,,,,,,DDDDDDDDDDDDmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''}}}}}}}}}}}}",
+"oooooooooooo,,,,,,,,,,,,DDDDDDDDDDDDmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''}}}}}}}}}}}}",
+"oooooooooooo,,,,,,,,,,,,DDDDDDDDDDDDmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''}}}}}}}}}}}}",
+"oooooooooooo,,,,,,,,,,,,DDDDDDDDDDDDmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''}}}}}}}}}}}}",
+"oooooooooooo,,,,,,,,,,,,DDDDDDDDDDDDmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''}}}}}}}}}}}}",
+"oooooooooooo,,,,,,,,,,,,DDDDDDDDDDDDmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''}}}}}}}}}}}}",
+"oooooooooooo,,,,,,,,,,,,DDDDDDDDDDDDmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''}}}}}}}}}}}}",
+"oooooooooooo,,,,,,,,,,,,DDDDDDDDDDDDmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''}}}}}}}}}}}}",
+"oooooooooooo,,,,,,,,,,,,DDDDDDDDDDDDmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''}}}}}}}}}}}}",
+"oooooooooooo,,,,,,,,,,,,DDDDDDDDDDDDmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''}}}}}}}}}}}}",
+"oooooooooooo,,,,,,,,,,,,DDDDDDDDDDDDmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''}}}}}}}}}}}}",
+"oooooooooooo,,,,,,,,,,,,DDDDDDDDDDDDmmmmmmmmmmmmLLLLLLLLLLLL))))))))))))''''''''''''}}}}}}}}}}}}",
+"::::::::::::eeeeeeeeeeee444444444444mmmmmmmmmmmm^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"::::::::::::eeeeeeeeeeee444444444444mmmmmmmmmmmm^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"::::::::::::eeeeeeeeeeee444444444444mmmmmmmmmmmm^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"::::::::::::eeeeeeeeeeee444444444444mmmmmmmmmmmm^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"::::::::::::eeeeeeeeeeee444444444444mmmmmmmmmmmm^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"::::::::::::eeeeeeeeeeee444444444444mmmmmmmmmmmm^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"::::::::::::eeeeeeeeeeee444444444444mmmmmmmmmmmm^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"::::::::::::eeeeeeeeeeee444444444444mmmmmmmmmmmm^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"::::::::::::eeeeeeeeeeee444444444444mmmmmmmmmmmm^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"::::::::::::eeeeeeeeeeee444444444444mmmmmmmmmmmm^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"::::::::::::eeeeeeeeeeee444444444444mmmmmmmmmmmm^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"::::::::::::eeeeeeeeeeee444444444444mmmmmmmmmmmm^^^^^^^^^^^^____________''''''''''''{{{{{{{{{{{{",
+"............666666666666ZZZZZZZZZZZZbbbbbbbbbbbbPPPPPPPPPPPP````````````''''''''''''{{{{{{{{{{{{",
+"............666666666666ZZZZZZZZZZZZbbbbbbbbbbbbPPPPPPPPPPPP````````````''''''''''''{{{{{{{{{{{{",
+"............666666666666ZZZZZZZZZZZZbbbbbbbbbbbbPPPPPPPPPPPP````````````''''''''''''{{{{{{{{{{{{",
+"............666666666666ZZZZZZZZZZZZbbbbbbbbbbbbPPPPPPPPPPPP````````````''''''''''''{{{{{{{{{{{{",
+"............666666666666ZZZZZZZZZZZZbbbbbbbbbbbbPPPPPPPPPPPP````````````''''''''''''{{{{{{{{{{{{",
+"............666666666666ZZZZZZZZZZZZbbbbbbbbbbbbPPPPPPPPPPPP````````````''''''''''''{{{{{{{{{{{{",
+"............666666666666ZZZZZZZZZZZZbbbbbbbbbbbbPPPPPPPPPPPP````````````''''''''''''{{{{{{{{{{{{",
+"............666666666666ZZZZZZZZZZZZbbbbbbbbbbbbPPPPPPPPPPPP````````````''''''''''''{{{{{{{{{{{{",
+"............666666666666ZZZZZZZZZZZZbbbbbbbbbbbbPPPPPPPPPPPP````````````''''''''''''{{{{{{{{{{{{",
+"............666666666666ZZZZZZZZZZZZbbbbbbbbbbbbPPPPPPPPPPPP````````````''''''''''''{{{{{{{{{{{{",
+"............666666666666ZZZZZZZZZZZZbbbbbbbbbbbbPPPPPPPPPPPP````````````''''''''''''{{{{{{{{{{{{",
+"............666666666666ZZZZZZZZZZZZbbbbbbbbbbbbPPPPPPPPPPPP````````````''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaaiiiiiiiiiiiizzzzzzzzzzzzJJJJJJJJJJJJPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaaiiiiiiiiiiiizzzzzzzzzzzzJJJJJJJJJJJJPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaaiiiiiiiiiiiizzzzzzzzzzzzJJJJJJJJJJJJPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaaiiiiiiiiiiiizzzzzzzzzzzzJJJJJJJJJJJJPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaaiiiiiiiiiiiizzzzzzzzzzzzJJJJJJJJJJJJPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaaiiiiiiiiiiiizzzzzzzzzzzzJJJJJJJJJJJJPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaaiiiiiiiiiiiizzzzzzzzzzzzJJJJJJJJJJJJPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaaiiiiiiiiiiiizzzzzzzzzzzzJJJJJJJJJJJJPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaaiiiiiiiiiiiizzzzzzzzzzzzJJJJJJJJJJJJPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaaiiiiiiiiiiiizzzzzzzzzzzzJJJJJJJJJJJJPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaaiiiiiiiiiiiizzzzzzzzzzzzJJJJJJJJJJJJPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"aaaaaaaaaaaaiiiiiiiiiiiizzzzzzzzzzzzJJJJJJJJJJJJPPPPPPPPPPPP))))))))))))''''''''''''{{{{{{{{{{{{",
+"............eeeeeeeeeeee444444444444IIIIIIIIIIIIWWWWWWWWWWWW))))))))))))''''''''''''}}}}}}}}}}}}",
+"............eeeeeeeeeeee444444444444IIIIIIIIIIIIWWWWWWWWWWWW))))))))))))''''''''''''}}}}}}}}}}}}",
+"............eeeeeeeeeeee444444444444IIIIIIIIIIIIWWWWWWWWWWWW))))))))))))''''''''''''}}}}}}}}}}}}",
+"............eeeeeeeeeeee444444444444IIIIIIIIIIIIWWWWWWWWWWWW))))))))))))''''''''''''}}}}}}}}}}}}",
+"............eeeeeeeeeeee444444444444IIIIIIIIIIIIWWWWWWWWWWWW))))))))))))''''''''''''}}}}}}}}}}}}",
+"............eeeeeeeeeeee444444444444IIIIIIIIIIIIWWWWWWWWWWWW))))))))))))''''''''''''}}}}}}}}}}}}",
+"............eeeeeeeeeeee444444444444IIIIIIIIIIIIWWWWWWWWWWWW))))))))))))''''''''''''}}}}}}}}}}}}",
+"............eeeeeeeeeeee444444444444IIIIIIIIIIIIWWWWWWWWWWWW))))))))))))''''''''''''}}}}}}}}}}}}",
+"............eeeeeeeeeeee444444444444IIIIIIIIIIIIWWWWWWWWWWWW))))))))))))''''''''''''}}}}}}}}}}}}",
+"............eeeeeeeeeeee444444444444IIIIIIIIIIIIWWWWWWWWWWWW))))))))))))''''''''''''}}}}}}}}}}}}",
+"............eeeeeeeeeeee444444444444IIIIIIIIIIIIWWWWWWWWWWWW))))))))))))''''''''''''}}}}}}}}}}}}",
+"............eeeeeeeeeeee444444444444IIIIIIIIIIIIWWWWWWWWWWWW))))))))))))''''''''''''}}}}}}}}}}}}",
+"llllllllllll444444444444HHHHHHHHHHHHvvvvvvvvvvvv((((((((((((____________]]]]]]]]]]]]}}}}}}}}}}}}",
+"llllllllllll444444444444HHHHHHHHHHHHvvvvvvvvvvvv((((((((((((____________]]]]]]]]]]]]}}}}}}}}}}}}",
+"llllllllllll444444444444HHHHHHHHHHHHvvvvvvvvvvvv((((((((((((____________]]]]]]]]]]]]}}}}}}}}}}}}",
+"llllllllllll444444444444HHHHHHHHHHHHvvvvvvvvvvvv((((((((((((____________]]]]]]]]]]]]}}}}}}}}}}}}",
+"llllllllllll444444444444HHHHHHHHHHHHvvvvvvvvvvvv((((((((((((____________]]]]]]]]]]]]}}}}}}}}}}}}",
+"llllllllllll444444444444HHHHHHHHHHHHvvvvvvvvvvvv((((((((((((____________]]]]]]]]]]]]}}}}}}}}}}}}",
+"llllllllllll444444444444HHHHHHHHHHHHvvvvvvvvvvvv((((((((((((____________]]]]]]]]]]]]}}}}}}}}}}}}",
+"llllllllllll444444444444HHHHHHHHHHHHvvvvvvvvvvvv((((((((((((____________]]]]]]]]]]]]}}}}}}}}}}}}",
+"llllllllllll444444444444HHHHHHHHHHHHvvvvvvvvvvvv((((((((((((____________]]]]]]]]]]]]}}}}}}}}}}}}",
+"llllllllllll444444444444HHHHHHHHHHHHvvvvvvvvvvvv((((((((((((____________]]]]]]]]]]]]}}}}}}}}}}}}",
+"llllllllllll444444444444HHHHHHHHHHHHvvvvvvvvvvvv((((((((((((____________]]]]]]]]]]]]}}}}}}}}}}}}",
+"llllllllllll444444444444HHHHHHHHHHHHvvvvvvvvvvvv((((((((((((____________]]]]]]]]]]]]}}}}}}}}}}}}",
+"qqqqqqqqqqqq111111111111ssssssssssssGGGGGGGGGGGGQQQQQQQQQQQQ____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"qqqqqqqqqqqq111111111111ssssssssssssGGGGGGGGGGGGQQQQQQQQQQQQ____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"qqqqqqqqqqqq111111111111ssssssssssssGGGGGGGGGGGGQQQQQQQQQQQQ____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"qqqqqqqqqqqq111111111111ssssssssssssGGGGGGGGGGGGQQQQQQQQQQQQ____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"qqqqqqqqqqqq111111111111ssssssssssssGGGGGGGGGGGGQQQQQQQQQQQQ____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"qqqqqqqqqqqq111111111111ssssssssssssGGGGGGGGGGGGQQQQQQQQQQQQ____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"qqqqqqqqqqqq111111111111ssssssssssssGGGGGGGGGGGGQQQQQQQQQQQQ____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"qqqqqqqqqqqq111111111111ssssssssssssGGGGGGGGGGGGQQQQQQQQQQQQ____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"qqqqqqqqqqqq111111111111ssssssssssssGGGGGGGGGGGGQQQQQQQQQQQQ____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"qqqqqqqqqqqq111111111111ssssssssssssGGGGGGGGGGGGQQQQQQQQQQQQ____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"qqqqqqqqqqqq111111111111ssssssssssssGGGGGGGGGGGGQQQQQQQQQQQQ____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"qqqqqqqqqqqq111111111111ssssssssssssGGGGGGGGGGGGQQQQQQQQQQQQ____________[[[[[[[[[[[[{{{{{{{{{{{{",
+"ppppppppppppkkkkkkkkkkkkttttttttttttSSSSSSSSSSSS!!!!!!!!!!!!))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ppppppppppppkkkkkkkkkkkkttttttttttttSSSSSSSSSSSS!!!!!!!!!!!!))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ppppppppppppkkkkkkkkkkkkttttttttttttSSSSSSSSSSSS!!!!!!!!!!!!))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ppppppppppppkkkkkkkkkkkkttttttttttttSSSSSSSSSSSS!!!!!!!!!!!!))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ppppppppppppkkkkkkkkkkkkttttttttttttSSSSSSSSSSSS!!!!!!!!!!!!))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ppppppppppppkkkkkkkkkkkkttttttttttttSSSSSSSSSSSS!!!!!!!!!!!!))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ppppppppppppkkkkkkkkkkkkttttttttttttSSSSSSSSSSSS!!!!!!!!!!!!))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ppppppppppppkkkkkkkkkkkkttttttttttttSSSSSSSSSSSS!!!!!!!!!!!!))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ppppppppppppkkkkkkkkkkkkttttttttttttSSSSSSSSSSSS!!!!!!!!!!!!))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ppppppppppppkkkkkkkkkkkkttttttttttttSSSSSSSSSSSS!!!!!!!!!!!!))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ppppppppppppkkkkkkkkkkkkttttttttttttSSSSSSSSSSSS!!!!!!!!!!!!))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ppppppppppppkkkkkkkkkkkkttttttttttttSSSSSSSSSSSS!!!!!!!!!!!!))))))))))))]]]]]]]]]]]]{{{{{{{{{{{{",
+"ppppppppppppzzzzzzzzzzzzddddddddddddFFFFFFFFFFFFLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"ppppppppppppzzzzzzzzzzzzddddddddddddFFFFFFFFFFFFLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"ppppppppppppzzzzzzzzzzzzddddddddddddFFFFFFFFFFFFLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"ppppppppppppzzzzzzzzzzzzddddddddddddFFFFFFFFFFFFLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"ppppppppppppzzzzzzzzzzzzddddddddddddFFFFFFFFFFFFLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"ppppppppppppzzzzzzzzzzzzddddddddddddFFFFFFFFFFFFLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"ppppppppppppzzzzzzzzzzzzddddddddddddFFFFFFFFFFFFLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"ppppppppppppzzzzzzzzzzzzddddddddddddFFFFFFFFFFFFLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"ppppppppppppzzzzzzzzzzzzddddddddddddFFFFFFFFFFFFLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"ppppppppppppzzzzzzzzzzzzddddddddddddFFFFFFFFFFFFLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"ppppppppppppzzzzzzzzzzzzddddddddddddFFFFFFFFFFFFLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"ppppppppppppzzzzzzzzzzzzddddddddddddFFFFFFFFFFFFLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"666666666666************777777777777MMMMMMMMMMMMLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"666666666666************777777777777MMMMMMMMMMMMLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"666666666666************777777777777MMMMMMMMMMMMLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"666666666666************777777777777MMMMMMMMMMMMLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"666666666666************777777777777MMMMMMMMMMMMLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"666666666666************777777777777MMMMMMMMMMMMLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"666666666666************777777777777MMMMMMMMMMMMLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"666666666666************777777777777MMMMMMMMMMMMLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"666666666666************777777777777MMMMMMMMMMMMLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"666666666666************777777777777MMMMMMMMMMMMLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"666666666666************777777777777MMMMMMMMMMMMLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{",
+"666666666666************777777777777MMMMMMMMMMMMLLLLLLLLLLLL````````````''''''''''''{{{{{{{{{{{{"
+};
