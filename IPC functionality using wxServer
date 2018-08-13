@@ -1,0 +1,117 @@
+@@ -67,10 +67,12 @@ obj/irc.o: irc.cpp                  $(HEADERS)
+obj/ui_res.o: ui.rc  rc/bitcoin.ico rc/check.ico rc/send16.bmp rc/send16mask.bmp rc/send16masknoshadow.bmp rc/send20.bmp rc/send20mask.bmp rc/addressbook16.bmp rc/addressbook16mask.bmp rc/addressbook20.bmp rc/addressbook20mask.bmp
+	windres $(WXDEFS) $(INCLUDEPATHS) -o $@ -i $<
+
+obj/ipc.o: ipc.cpp                  $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+
+OBJS=obj/util.o obj/script.o obj/db.o obj/net.o obj/main.o obj/market.o \
+        obj/ui.o obj/uibase.o obj/sha.o obj/irc.o obj/ui_res.o
+        obj/ui.o obj/uibase.o obj/sha.o obj/irc.o obj/ui_res.o obj/ipc.o
+
+bitcoin.exe: headers.h.gch $(OBJS)
+	-kill /f bitcoin.exe
+  @@ -75,11 +75,12 @@ obj/sha.o: sha.cpp                  sha.h
+obj/irc.o: irc.cpp                  $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+
+obj/ipc.o: ipc.cpp                  $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+
+OBJS=obj/util.o obj/script.o obj/db.o obj/net.o obj/main.o obj/market.o \
+        obj/ui.o obj/uibase.o obj/sha.o obj/irc.o
+        obj/ui.o obj/uibase.o obj/sha.o obj/irc.o obj/ipc.o
+
+bitcoin: headers.h.gch $(OBJS)
+	g++ $(CFLAGS) -o $@ $(LIBPATHS) $(OBJS) $(LIBS)
+  @@ -31,7 +31,7 @@ LIBS= \
+   -l wx_gtk2u$(D)-2.9 \
+ -Wl,-Bdynamic \
+   -l crypto \
+   -l gtk-x11-2.0 -l gthread-2.0 -l SM
+   -l gtk-x11-2.0 -l gthread-2.0 -l SM \
+
+WXDEFS=-D__WXGTK__ -DNOPCH
+CFLAGS=-O0 -Wno-invalid-offsetof -Wformat $(DEBUGFLAGS) $(WXDEFS) $(INCLUDEPATHS)
+@@ -75,11 +75,12 @@ obj/sha.o: sha.cpp                  sha.h
+obj/irc.o: irc.cpp                  $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+
+obj/ipc.o: ipc.cpp                  $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+
+OBJS=obj/util.o obj/script.o obj/db.o obj/net.o obj/main.o obj/market.o \
+        obj/ui.o obj/uibase.o obj/sha.o obj/irc.o
+        obj/ui.o obj/uibase.o obj/sha.o obj/irc.o obj/ipc.o
+
+bitcoin: headers.h.gch $(OBJS)
+	g++ $(CFLAGS) -o $@ $(LIBPATHS) $(OBJS) $(LIBS)
+  @@ -21,6 +21,7 @@ DEFINE_EVENT_TYPE(wxEVT_REPLY3)
+
+CMainFrame* pframeMain = NULL;
+CMyTaskBarIcon* ptaskbaricon = NULL;
+CServer* pserver = NULL;
+map<string, string> mapAddressBook;
+bool fRandSendTest = false;
+void RandSend();
+@@ -384,6 +385,8 @@ CMainFrame::~CMainFrame()
+    pframeMain = NULL;
+    delete ptaskbaricon;
+    ptaskbaricon = NULL;
+    delete pserver;
+    pserver = NULL;
+}
+
+void ExitTimeout(void* parg)
+@@ -1687,8 +1690,8 @@ CAboutDialog::CAboutDialog(wxWindow* parent) : CAboutDialogBase(parent)
+#if !wxUSE_UNICODE
+    // Workaround until upgrade to wxWidgets supporting UTF-8
+    wxString str = m_staticTextMain->GetLabel();
+    if (str.Find('�') != wxNOT_FOUND)
+        str.Remove(str.Find('�'), 1);
+    if (str.Find('�') != wxNOT_FOUND)
+        str.Remove(str.Find('�'), 1);
+    m_staticTextMain->SetLabel(str);
+#endif
+#ifndef __WXMSW__
+@@ -3548,6 +3551,26 @@ bool CMyApp::OnInit2()
+        return false;
+    }
+
+    if (mapArgs.count("-blockamount")) {
+        CClient client;
+        wxString hostname = "localhost";
+        wxString server = GetDataDir() + "service";
+        CClientConnection * pconnection = (CClientConnection *)client.MakeConnection(hostname, server, "ipc test");
+        string output = "";
+        if (pconnection) {
+            char * pbuffer = (char *)pconnection->Request("blockamount");
+            while (*pbuffer != '\n') {
+                output += *pbuffer;
+                pbuffer++;
+            }
+        }
+        else {
+            output = "Cannot access Bitcoin. Are you sure the program is running?\n";
+        }
+        fprintf(stderr, "%s", output.c_str());
+        return false;
+    }
+
+    if (mapArgs.count("-datadir"))
+        strlcpy(pszSetDataDir, mapArgs["-datadir"].c_str(), sizeof(pszSetDataDir));
+
+@@ -3755,6 +3778,8 @@ bool CMyApp::OnInit2()
+    if (fFirstRun)
+        SetStartOnSystemStartup(true);
+
+    pserver = new CServer;
+    pserver->Create(GetDataDir() + "service");
+
+    //
+    // Tests
