@@ -1,0 +1,80 @@
+@@ -24,6 +24,8 @@
+#include <wx/taskbar.h>
+#include <wx/stdpaths.h>
+#include <wx/utils.h>
+#include <wx/ipc.h>
+#include <wx/ipcbase.h>
+#include <openssl/ecdsa.h>
+#include <openssl/evp.h>
+#include <openssl/rand.h>
+@@ -102,6 +104,7 @@ using namespace boost;
+#include "market.h"
+#include "uibase.h"
+#include "ui.h"
+#include "ipc.h"
+
+#include "xpm/addressbook16.xpm"
+#include "xpm/addressbook20.xpm"
+@@ -0,0 +1,33 @@
+/*
+ * Inter-process calling functionality
+ */
+
+#include "headers.h"
+
+wxConnectionBase * CServer::OnAcceptConnection (const wxString &topic) {
+    return new CServerConnection;
+}
+
+wxConnectionBase * CClient::OnMakeConnection () {
+    return new CClientConnection;
+}
+
+// For request based handling
+const void * CServerConnection::OnRequest (const wxString &topic, const wxString &item, size_t *size, wxIPCFormat format) {
+    const char * output;
+
+    if (item == "blockamount") {
+        stringstream stream;
+        stream << nBestHeight + 1;
+        output = stream.str().c_str();
+    }
+    else
+        output = "Unknown identifier";
+    
+    return output;
+}
+
+// For event based handling
+bool CClientConnection::OnAdvise (const wxString &topic, const wxString &item, const void *data, size_t size, wxIPCFormat format) {
+    return false;
+}
+\ No newline at end of file
+@@ -0,0 +1,28 @@
+#ifndef _IPC_H
+#define	_IPC_H
+
+class CServer : public wxServer {
+public:
+    wxConnectionBase * OnAcceptConnection (const wxString &topic);
+};
+
+class CClient : public wxClient {
+public:
+    wxConnectionBase * OnMakeConnection ();
+};
+
+class CServerConnection : public wxConnection {
+public:
+    const void * OnRequest (const wxString &topic, const wxString &item, size_t *size, wxIPCFormat format);
+};
+
+class CClientConnection : public wxConnection {
+public:
+    CClientConnection() : wxConnection() {}
+    ~CClientConnection() {}
+    
+    bool OnAdvise (const wxString &topic, const wxString &item, const void *data, size_t size, wxIPCFormat format);
+};
+
+#endif	/* _IPC_H */
