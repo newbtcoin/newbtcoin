@@ -1,0 +1,182 @@
+@@ -1,4 +1,4 @@
+// Copyright (c) 2009 Satoshi Nakamoto
+// Copyright (c) 2009-2010 Satoshi Nakamoto
+// Distributed under the MIT/X11 software license, see the accompanying
+// file license.txt or http://www.opensource.org/licenses/mit-license.php.
+
+@@ -309,6 +309,37 @@ public:
+            *this = 0 - *this;
+    }
+
+    std::string ToString(int nBase=10) const
+    {
+        CAutoBN_CTX pctx;
+        CBigNum bnBase = nBase;
+        CBigNum bn0 = 0;
+        string str;
+        CBigNum bn = *this;
+        BN_set_negative(&bn, false);
+        CBigNum dv;
+        CBigNum rem;
+        if (BN_cmp(&bn, &bn0) == 0)
+            return "0";
+        while (BN_cmp(&bn, &bn0) > 0)
+        {
+            if (!BN_div(&dv, &rem, &bn, &bnBase, pctx))
+                throw bignum_error("CBigNum::ToString() : BN_div failed");
+            bn = dv;
+            unsigned int c = rem.getulong();
+            str += "0123456789abcdef"[c];
+        }
+        if (BN_is_negative(this))
+            str += "-";
+        reverse(str.begin(), str.end());
+        return str;
+    }
+
+    std::string GetHex() const
+    {
+        return ToString(16);
+    }
+
+    unsigned int GetSerializeSize(int nType=0, int nVersion=VERSION) const
+    {
+        return ::GetSerializeSize(getvch(), nType, nVersion);
+        @@ -1,6 +1,6 @@
+Bitcoin v0.2.0 BETA
+
+Copyright (c) 2009 Satoshi Nakamoto
+Copyright (c) 2009-2010 Satoshi Nakamoto
+Distributed under the MIT/X11 software license, see the accompanying
+file license.txt or http://www.opensource.org/licenses/mit-license.php.
+This product includes software developed by the OpenSSL Project for use in
+@@ -13,8 +13,16 @@ WINDOWS BUILD NOTES
+
+Compilers Supported
+-------------------
+MinGW GCC
+Microsoft Visual C++ 6.0 SP6
+MinGW GCC (recommended)
+
+MSVC 6.0 SP6: You'll need Boost version 1.34 because they dropped support
+for MSVC 6.0 after that.  However, they didn't add Asio until 1.35.
+You should still be able to build with MSVC 6.0 by adding Asio to 1.34 by
+unpacking boost_asio_*.zip into the boost directory:
+http://sourceforge.net/projects/asio/files/asio
+
+MSVC 8.0 (2005) SP1 has been tested.  Note: MSVC 7.0 and up have a habit of
+linking to runtime DLLs that are not installed on XP by default.
+
+
+Dependencies
+@@ -22,8 +30,7 @@ Dependencies
+Libraries you need to download separately and build:
+
+              default path   download
+wxWidgets      \wxwidgets     http://www.wxwidgets.org/downloads/
+                                or prebuilt: http://wxpack.sourceforge.net
+wxWidgets      \wxwidgets     prebuilt: http://wxpack.sourceforge.net
+OpenSSL        \openssl       http://www.openssl.org/source/
+Berkeley DB    \db            http://www.oracle.com/technology/software/products/berkeley-db/index.html
+Boost          \boost         http://www.boost.org/users/download/
+@@ -89,3 +96,13 @@ Using MinGW and MSYS:
+cd \db\build_unix
+sh ../dist/configure --enable-mingw --enable-cxx
+make
+
+
+Boost
+-----
+download bjam.exe from
+http://sourceforge.net/project/showfiles.php?group_id=7586&package_id=72941
+cd \boost
+bjam toolset=gcc --build-type=complete stage
+or
+bjam toolset=msvc --build-type=complete stage
+@@ -1,8 +1,7 @@
+// Copyright (c) 2009 Satoshi Nakamoto
+// Copyright (c) 2009-2010 Satoshi Nakamoto
+// Distributed under the MIT/X11 software license, see the accompanying
+// file license.txt or http://www.opensource.org/licenses/mit-license.php.
+
+#include <db_cxx.h>
+class CTransaction;
+class CTxIndex;
+class CDiskBlockIndex;
+@@ -14,6 +13,7 @@ class CAddress;
+class CWalletTx;
+
+extern map<string, string> mapAddressBook;
+extern CCriticalSection cs_mapAddressBook;
+extern bool fClient;
+
+
+@@ -359,15 +359,17 @@ public:
+
+    bool WriteName(const string& strAddress, const string& strName)
+    {
+        CRITICAL_BLOCK(cs_mapAddressBook)
+            mapAddressBook[strAddress] = strName;
+        nWalletDBUpdated++;
+        mapAddressBook[strAddress] = strName;
+        return Write(make_pair(string("name"), strAddress), strName);
+    }
+
+    bool EraseName(const string& strAddress)
+    {
+        CRITICAL_BLOCK(cs_mapAddressBook)
+            mapAddressBook.erase(strAddress);
+        nWalletDBUpdated++;
+        mapAddressBook.erase(strAddress);
+        return Erase(make_pair(string("name"), strAddress));
+    }
+@@ -29,6 +29,7 @@
+#include <openssl/rand.h>
+#include <openssl/sha.h>
+#include <openssl/ripemd.h>
+#include <db_cxx.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+@@ -36,6 +37,7 @@
+#include <float.h>
+#include <assert.h>
+#include <memory>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
+@@ -53,6 +55,8 @@
+#include <boost/array.hpp>
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
+
+#ifdef __WXMSW__
+#include <windows.h>
+@@ -73,8 +77,6 @@
+#include <errno.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
+#endif
+#ifdef __BSD__
+#include <netinet/in.h>
+@@ -85,8 +87,6 @@
+using namespace std;
+using namespace boost;
+
+
+
+#include "strlcpy.h"
+#include "serialize.h"
+#include "uint256.h"
+@@ -100,6 +100,7 @@ using namespace boost;
+#include "irc.h"
+#include "main.h"
+#include "market.h"
+#include "rpc.h"
+#include "uibase.h"
+#include "ui.h"
