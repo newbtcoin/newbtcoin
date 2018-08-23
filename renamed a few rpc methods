@@ -1,0 +1,99 @@
+@@ -22,7 +22,7 @@ LIBS= \
+    wxmsw28$(D)_richtext.lib wxmsw28$(D)_html.lib wxmsw28$(D)_core.lib wxmsw28$(D)_adv.lib wxbase28$(D).lib wxtiff$(D).lib wxjpeg$(D).lib wxpng$(D).lib wxzlib$(D).lib wxregex$(D).lib wxexpat$(D).lib \
+    kernel32.lib user32.lib gdi32.lib comdlg32.lib winspool.lib winmm.lib shell32.lib comctl32.lib ole32.lib oleaut32.lib uuid.lib rpcrt4.lib advapi32.lib ws2_32.lib shlwapi.lib
+WXDEFS=/DWIN32 /D__WXMSW__ /D_WINDOWS /DNOPCH
+CFLAGS=/c /nologo /Ob0 /MD$(D) /EHsc /GR /Zm300 /YX /Fpobj/headers.pch $(DEBUGFLAGS) $(WXDEFS) $(INCLUDEPATHS)
+CFLAGS=/c /nologo /Ob0 /MD$(D) /EHsc /GR /Zm300 $(DEBUGFLAGS) $(WXDEFS) $(INCLUDEPATHS)
+HEADERS=headers.h strlcpy.h serialize.h uint256.h util.h key.h bignum.h base58.h script.h db.h net.h irc.h main.h market.h rpc.h uibase.h ui.h
+
+@@ -655,11 +655,7 @@ void ThreadSocketHandler2(void* parg)
+        if (FD_ISSET(hListenSocket, &fdsetRecv))
+        {
+            struct sockaddr_in sockaddr;
+#ifdef __WXMSW__
+            int len = sizeof(sockaddr);
+#else
+            socklen_t len = sizeof(sockaddr);
+#endif
+            SOCKET hSocket = accept(hListenSocket, (struct sockaddr*)&sockaddr, &len);
+            CAddress addr(sockaddr);
+            if (hSocket == INVALID_SOCKET)
+         @@ -157,12 +157,12 @@ Value listtransactions(const Array& params)
+}
+
+
+Value getamountpaid(const Array& params)
+Value getamountreceived(const Array& params)
+{
+    if (params.size() < 1 || params.size() > 2)
+        throw runtime_error(
+            "getamountpaid <bitcoinaddress> [minconf=1]\n"
+            "Returns the total amount paid to <bitcoinaddress> in transactions with at least [minconf] confirmations.");
+            "getamountreceived <bitcoinaddress> [minconf=1]\n"
+            "Returns the total amount received by <bitcoinaddress> in transactions with at least [minconf] confirmations.");
+
+    // Bitcoin address
+    string strAddress = params[0].get_str();
+@@ -207,15 +207,15 @@ struct tallyitem
+    }
+};
+
+Value getallpayments(const Array& params)
+Value getallreceived(const Array& params)
+{
+    if (params.size() > 1)
+        throw runtime_error(
+            "getallpayments [minconf=1]\n"
+            "getallreceived [minconf=1]\n"
+            "[minconf] is the minimum number of confirmations before payments are included.\n"
+            "Returns an array of objects containing:\n"
+            "  \"address\" : bitcoin address\n"
+            "  \"amount\" : total amount paid to the address\n"
+            "  \"amount\" : total amount received by the address\n"
+            "  \"conf\" : number of confirmations\n"
+            "  \"label\" : the label set for this address when it was created by getnewaddress");
+
+@@ -294,8 +294,8 @@ pair<string, rpcfn_type> pCallTable[] =
+    make_pair("getnewaddress",      &getnewaddress),
+    make_pair("sendtoaddress",      &sendtoaddress),
+    make_pair("listtransactions",   &listtransactions),
+    make_pair("getamountpaid",      &getamountpaid),
+    make_pair("getallpayments",     &getallpayments),
+    make_pair("getamountreceived",  &getamountreceived),
+    make_pair("getallreceived",     &getallreceived),
+};
+map<string, rpcfn_type> mapCallTable(pCallTable, pCallTable + sizeof(pCallTable)/sizeof(pCallTable[0]));
+
+@@ -571,11 +571,11 @@ int CommandLineRPC(int argc, char *argv[])
+
+        // Special case other types
+        int n = params.size();
+        if (strMethod == "sendtoaddress"    && n > 1) ConvertTo<double>(params[1]);
+        if (strMethod == "listtransactions" && n > 0) ConvertTo<boost::int64_t>(params[0]);
+        if (strMethod == "listtransactions" && n > 1) ConvertTo<bool>(params[1]);
+        if (strMethod == "getamountpaid"    && n > 1) ConvertTo<boost::int64_t>(params[1]);
+        if (strMethod == "getallpayments"   && n > 0) ConvertTo<boost::int64_t>(params[0]);
+        if (strMethod == "sendtoaddress"     && n > 1) ConvertTo<double>(params[1]);
+        if (strMethod == "listtransactions"  && n > 0) ConvertTo<boost::int64_t>(params[0]);
+        if (strMethod == "listtransactions"  && n > 1) ConvertTo<bool>(params[1]);
+        if (strMethod == "getamountreceived" && n > 1) ConvertTo<boost::int64_t>(params[1]);
+        if (strMethod == "getallreceived"    && n > 0) ConvertTo<boost::int64_t>(params[0]);
+
+        // Execute
+        Value result = CallRPC(strMethod, params);
+    @@ -20,7 +20,7 @@ class CDataStream;
+class CAutoFile;
+
+static const int VERSION = 201;
+static const char* pszSubVer = ".0";
+static const char* pszSubVer = ".1";
+
+
+    @@ -68,6 +68,7 @@ static const bool fWindows = true;
+#define S_IWUSR             0200
+#endif
+#define unlink              _unlink
+typedef int socklen_t;
+#else
+static const bool fWindows = false;
+#define WSAGetLastError()   errno
