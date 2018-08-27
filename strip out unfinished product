@@ -1,0 +1,169 @@
+@@ -99,7 +99,6 @@ using namespace boost;
+#include "net.h"
+#include "irc.h"
+#include "main.h"
+#include "market.h"
+#include "rpc.h"
+#include "uibase.h"
+#include "ui.h"
+@@ -99,7 +99,6 @@ using namespace boost;
+#include "net.h"
+#include "irc.h"
+#include "main.h"
+#include "market.h"
+#include "rpc.h"
+#include "uibase.h"
+#include "ui.h"
+@@ -25,7 +25,7 @@ LIBS= \
+ -l kernel32 -l user32 -l gdi32 -l comdlg32 -l winspool -l winmm -l shell32 -l comctl32 -l ole32 -l oleaut32 -l uuid -l rpcrt4 -l advapi32 -l ws2_32 -l shlwapi
+WXDEFS=-DWIN32 -D__WXMSW__ -D_WINDOWS -DNOPCH
+CFLAGS=-mthreads -O0 -w -Wno-invalid-offsetof -Wformat $(DEBUGFLAGS) $(WXDEFS) $(INCLUDEPATHS)
+HEADERS=headers.h strlcpy.h serialize.h uint256.h util.h key.h bignum.h base58.h script.h db.h net.h irc.h main.h market.h rpc.h uibase.h ui.h
+HEADERS=headers.h strlcpy.h serialize.h uint256.h util.h key.h bignum.h base58.h script.h db.h net.h irc.h main.h rpc.h uibase.h ui.h
+
+
+
+@@ -50,9 +50,6 @@ obj/net.o: net.cpp                  $(HEADERS)
+obj/main.o: main.cpp                $(HEADERS) sha.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/market.o: market.cpp            $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/ui.o: ui.cpp                    $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+@@ -73,7 +70,7 @@ obj/ui_res.o: ui.rc  rc/bitcoin.ico rc/check.ico rc/send16.bmp rc/send16mask.bmp
+
+
+
+OBJS=obj/util.o obj/script.o obj/db.o obj/net.o obj/main.o obj/market.o \
+OBJS=obj/util.o obj/script.o obj/db.o obj/net.o obj/main.o \
+        obj/ui.o obj/uibase.o obj/sha.o obj/irc.o obj/rpc.o \
+        obj/ui_res.o
+@@ -35,7 +35,7 @@ LIBS= \
+
+WXDEFS=-D__WXGTK__ -DNOPCH
+CFLAGS=-O0 -Wno-invalid-offsetof -Wformat $(DEBUGFLAGS) $(WXDEFS) $(INCLUDEPATHS)
+HEADERS=headers.h strlcpy.h serialize.h uint256.h util.h key.h bignum.h base58.h script.h db.h net.h irc.h main.h market.h rpc.h uibase.h ui.h
+HEADERS=headers.h strlcpy.h serialize.h uint256.h util.h key.h bignum.h base58.h script.h db.h net.h irc.h main.h rpc.h uibase.h ui.h
+
+
+
+@@ -60,9 +60,6 @@ obj/net.o: net.cpp                  $(HEADERS)
+obj/main.o: main.cpp                $(HEADERS) sha.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/market.o: market.cpp            $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/ui.o: ui.cpp                    $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+@@ -80,7 +77,7 @@ obj/rpc.o: rpc.cpp                  $(HEADERS)
+
+
+
+OBJS=obj/util.o obj/script.o obj/db.o obj/net.o obj/main.o obj/market.o \
+OBJS=obj/util.o obj/script.o obj/db.o obj/net.o obj/main.o \
+        obj/ui.o obj/uibase.o obj/sha.o obj/irc.o obj/rpc.o
+
+bitcoin: headers.h.gch $(OBJS)
+@@ -35,7 +35,7 @@ LIBS= \
+
+WXDEFS=-D__WXGTK__ -DNOPCH
+CFLAGS=-O0 -Wno-invalid-offsetof -Wformat $(DEBUGFLAGS) $(WXDEFS) $(INCLUDEPATHS)
+HEADERS=headers.h strlcpy.h serialize.h uint256.h util.h key.h bignum.h base58.h script.h db.h net.h irc.h main.h market.h rpc.h uibase.h ui.h
+HEADERS=headers.h strlcpy.h serialize.h uint256.h util.h key.h bignum.h base58.h script.h db.h net.h irc.h main.h rpc.h uibase.h ui.h
+
+
+
+@@ -60,9 +60,6 @@ obj/net.o: net.cpp                  $(HEADERS)
+obj/main.o: main.cpp                $(HEADERS) sha.h
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/market.o: market.cpp            $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+obj/ui.o: ui.cpp                    $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+@@ -80,7 +77,7 @@ obj/rpc.o: rpc.cpp                  $(HEADERS)
+
+
+
+OBJS=obj/util.o obj/script.o obj/db.o obj/net.o obj/main.o obj/market.o \
+OBJS=obj/util.o obj/script.o obj/db.o obj/net.o obj/main.o \
+        obj/ui.o obj/uibase.o obj/sha.o obj/irc.o obj/rpc.o
+
+bitcoin: headers.h.gch $(OBJS)
+@@ -23,7 +23,7 @@ LIBS= \
+    kernel32.lib user32.lib gdi32.lib comdlg32.lib winspool.lib winmm.lib shell32.lib comctl32.lib ole32.lib oleaut32.lib uuid.lib rpcrt4.lib advapi32.lib ws2_32.lib shlwapi.lib
+WXDEFS=/DWIN32 /D__WXMSW__ /D_WINDOWS /DNOPCH
+CFLAGS=/c /nologo /Ob0 /MD$(D) /EHsc /GR /Zm300 $(DEBUGFLAGS) $(WXDEFS) $(INCLUDEPATHS)
+HEADERS=headers.h strlcpy.h serialize.h uint256.h util.h key.h bignum.h base58.h script.h db.h net.h irc.h main.h market.h rpc.h uibase.h ui.h
+HEADERS=headers.h strlcpy.h serialize.h uint256.h util.h key.h bignum.h base58.h script.h db.h net.h irc.h main.h rpc.h uibase.h ui.h
+
+
+
+@@ -45,9 +45,6 @@ obj\net.obj: net.cpp          $(HEADERS)
+obj\main.obj: main.cpp        $(HEADERS) sha.h
+    cl $(CFLAGS) /Fo$@ %s
+
+obj\market.obj: market.cpp    $(HEADERS)
+    cl $(CFLAGS) /Fo$@ %s
+
+obj\ui.obj: ui.cpp            $(HEADERS)
+    cl $(CFLAGS) /Fo$@ %s
+
+@@ -68,7 +65,7 @@ obj\ui.res: ui.rc  rc/bitcoin.ico rc/check.ico rc/send16.bmp rc/send16mask.bmp r
+
+
+
+OBJS=obj\util.obj obj\script.obj obj\db.obj obj\net.obj obj\main.obj obj\market.obj \
+OBJS=obj\util.obj obj\script.obj obj\db.obj obj\net.obj obj\main.obj \
+    obj\ui.obj obj\uibase.obj obj\sha.obj obj\irc.obj obj\rpc.obj \
+    obj\ui.res
+@@ -381,11 +381,6 @@ void CNode::CancelSubscribe(unsigned int nChannel)
+            foreach(CNode* pnode, vNodes)
+                if (pnode != this)
+                    pnode->PushMessage("sub-cancel", nChannel);
+
+        // Clear memory, no longer subscribed
+        if (nChannel == MSG_PRODUCT)
+            CRITICAL_BLOCK(cs_mapProducts)
+                mapProducts.clear();
+    }
+}
+
+@@ -497,10 +492,6 @@ void CNode::Cleanup()
+    // All of a nodes broadcasts and subscriptions are automatically torn down
+    // when it goes down, so a node has to stay up to keep its broadcast going.
+
+    CRITICAL_BLOCK(cs_mapProducts)
+        for (map<uint256, CProduct>::iterator mi = mapProducts.begin(); mi != mapProducts.end();)
+            AdvertRemoveSource(this, MSG_PRODUCT, 0, (*(mi++)).second);
+
+    // Cancel subscriptions
+    for (unsigned int nChannel = 0; nChannel < vfSubscribe.size(); nChannel++)
+        if (vfSubscribe[nChannel])
+        @@ -341,9 +341,6 @@ enum
+{
+    MSG_TX = 1,
+    MSG_BLOCK,
+    MSG_REVIEW,
+    MSG_PRODUCT,
+    MSG_TABLE,
+};
+
+static const char* ppszTypeName[] =
+@@ -351,9 +348,6 @@ static const char* ppszTypeName[] =
+    "ERROR",
+    "tx",
+    "block",
+    "review",
+    "product",
+    "table",
+};
+
+class CInv
